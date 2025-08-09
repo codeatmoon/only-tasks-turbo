@@ -32,3 +32,18 @@ export function createTokenExpiry(hours: number = 24): Date {
   expiry.setHours(expiry.getHours() + hours)
   return expiry
 }
+
+export function generateEmailVerificationPin(): string {
+  // Generate a 6-digit PIN
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+export function generateVerificationId(): string {
+  return `verification-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`
+}
+
+export function createPinExpiry(minutes: number = 15): Date {
+  const expiry = new Date()
+  expiry.setMinutes(expiry.getMinutes() + minutes)
+  return expiry
+}

@@ -87,6 +87,23 @@ export class DataService {
     return await this.db.markTokenUsed(tokenId)
   }
 
+  // Email verification operations
+  async createEmailVerification(verification: Omit<import('./database/types').DbEmailVerification, 'created_at'>) {
+    return await this.db.createEmailVerification(verification)
+  }
+
+  async getEmailVerification(email: string, pin: string) {
+    return await this.db.getEmailVerification(email, pin)
+  }
+
+  async markEmailVerified(verificationId: string) {
+    return await this.db.markEmailVerified(verificationId)
+  }
+
+  async getEmailVerificationByEmail(email: string) {
+    return await this.db.getEmailVerificationByEmail(email)
+  }
+
   // Space operations
   async getSpace(spaceId: string) {
     return await this.db.getSpace(spaceId)

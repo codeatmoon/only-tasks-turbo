@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, name, description, email, password, ownerName } = body
+    const { id, name, description, email, password, ownerName, verificationId } = body
 
     if (!id || !name) {
       return NextResponse.json(
@@ -44,6 +44,26 @@ export async function POST(request: NextRequest) {
     // Get or create user
     let user = await dataService.getGlobalUserByEmail(email)
     if (!user) {
+      // If user doesn't exist, check for email verification
+      if (!verificationId) {
+        return NextResponse.json(
+          { 
+            error: 'Email verification required',
+            requiresVerification: true
+          },
+          { status: 400 }
+        )
+      }
+
+      // Check if email was verified
+      const verification = await dataService.getEmailVerificationByEmail(email)
+      if (!verification || !verification.verified || verification.id !== verificationId) {
+        return NextResponse.json(
+          { error: 'Email verification not found or not verified' },
+          { status: 400 }
+        )
+      }
+
       if (!password) {
         return NextResponse.json(
           { error: 'Password is required for new users' },
