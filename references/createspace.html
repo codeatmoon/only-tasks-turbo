@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Create or Access Your Space — Mockup</title>
+    <style>
+        :root {
+            /* light theme (matches your light screenshots) */
+            --bg: #f6f8fc;
+            --text: #0f172a;
+            --muted: #64748b;
+            --panel: #ffffff;
+            --border: #e6eaf0;
+            --border-soft: #eef2f7;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --primary: #386bff;
+            --primary-hover: #2f59d8;
+            --link: #2563eb;
+            --surface-subtle: #f8fafc;
+            --shadow-elev: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 10px rgba(16, 24, 40, .05);
+            --radius: 14px;
+            --gap: 28px;
+            --max-width: 1100px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* dark theme (matches your dark screenshots) */
+                --bg: #0e121a;
+                --text: #e6eef8;
+                --muted: #9aa6b2;
+                --panel: #0f1720;
+                --border: #243041;
+                --border-soft: #1b2636;
+                --input-bg: #0f1720;
+                --input-border: #2a374a;
+                --primary: #3d71ff;
+                --primary-hover: #315cdf;
+                --link: #9fb7ff;
+                --surface-subtle: #121a26;
+                --shadow-elev: 0 8px 24px rgba(3, 6, 10, .35), inset 0 1px 0 rgba(255, 255, 255, .03);
+            }
+        }
+
+        /* Theme overrides via data-theme attribute */
+        :root[data-theme="light"] {
+            --bg: #f6f8fc;
+            --text: #0f172a;
+            --muted: #64748b;
+            --panel: #ffffff;
+            --border: #e6eaf0;
+            --border-soft: #eef2f7;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --primary: #386bff;
+            --primary-hover: #2f59d8;
+            --link: #2563eb;
+            --surface-subtle: #f8fafc;
+            --shadow-elev: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 10px rgba(16, 24, 40, .05);
+            --radius: 14px;
+            --gap: 28px;
+            --max-width: 1100px;
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #0e121a;
+            --text: #e6eef8;
+            --muted: #9aa6b2;
+            --panel: #0f1720;
+            --border: #243041;
+            --border-soft: #1b2636;
+            --input-bg: #0f1720;
+            --input-border: #2a374a;
+            --primary: #3d71ff;
+            --primary-hover: #315cdf;
+            --link: #9fb7ff;
+            --surface-subtle: #121a26;
+            --shadow-elev: 0 8px 24px rgba(3, 6, 10, .35), inset 0 1px 0 rgba(255, 255, 255, .03);
+            --radius: 14px;
+            --gap: 28px;
+            --max-width: 1100px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 48px 20px;
+            gap: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+        }
+
+        header {
+            /* center -> left to match other pages */
+            text-align: left;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 36px;
+            margin: 0;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+        }
+
+        header p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            appearance: none;
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: var(--shadow-elev);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+            grid-template-areas: "left divider right";
+            gap: var(--gap);
+            align-items: stretch;
+            /* make both cards equal height */
+        }
+
+        /* Keep panels from forcing overflow */
+        .layout>.panel {
+            min-width: 0;
+        }
+
+        /* card panels */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-elev);
+            border-radius: var(--radius);
+            padding: 28px;
+            min-height: 420px;
+        }
+
+        .panel h2 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+        }
+
+        .panel p.lead {
+            color: var(--muted);
+            margin: 0 0 18px 0;
+            font-size: 14px
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            width: 100%;
+            padding: 12px 14px;
+            color: inherit;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 92px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(56, 107, 255, .10);
+        }
+
+        .actions {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Chip-style buttons (match tag look) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface-subtle);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Color variants (like status/priority chips) */
+        .btn-blue {
+            color: #2f59d8;
+            background: rgba(56, 107, 255, 0.12);
+            border-color: rgba(56, 107, 255, 0.35);
+        }
+
+        .btn-blue:hover {
+            background: rgba(56, 107, 255, 0.18);
+        }
+
+        .btn-amber {
+            color: #b45309;
+            background: rgba(245, 158, 11, 0.14);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .btn-amber:hover {
+            background: rgba(245, 158, 11, 0.20);
+        }
+
+        .btn-rose {
+            color: #be123c;
+            background: rgba(244, 63, 94, 0.14);
+            border-color: rgba(244, 63, 94, 0.38);
+        }
+
+        .btn-rose:hover {
+            background: rgba(244, 63, 94, 0.20);
+        }
+
+        .btn-slate {
+            color: #475569;
+            background: rgba(148, 163, 184, 0.14);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+
+        .btn-slate:hover {
+            background: rgba(148, 163, 184, 0.20);
+        }
+
+        /* Dark mode tweaks for slate text legibility */
+        :root[data-theme="dark"] .btn-slate {
+            color: #cbd5e1;
+        }
+
+        /* Optional: neutralize legacy button variants if still present */
+        .btn.primary,
+        .btn.ghost {
+            background: inherit;
+            border-color: inherit;
+            color: inherit;
+            box-shadow: none;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 28px
+            }
+
+            .layout {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                grid-template-areas: "left right";
+                gap: 16px;
+            }
+
+            .panel {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .divider {
+                display: none
+            }
+
+            .actions {
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        /* In-field password eye toggle */
+        .pw-field {
+            position: relative;
+        }
+
+        .pw-field>input {
+            padding-right: 40px;
+            /* room for eye button */
+        }
+
+        .pw-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            background: transparent;
+            border: 0;
+            border-radius: 6px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .pw-eye:hover {
+            color: var(--text);
+        }
+
+        .pw-eye:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .pw-eye svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" role="main">
+        <header>
+            <h1>Create or Access Your Space</h1>
+            <p>Set up your new space or log in to an existing one — all in a single page.</p>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false"
+                aria-label="Toggle theme">🌙
+            </button>
+        </header>
+
+        <section class="layout" aria-label="Create or access">
+            <!-- Left: New Space -->
+            <form class="panel" id="createSpaceForm" aria-labelledby="newspace-title" autocomplete="on" novalidate
+                style="grid-area: left;">
+                <h2 id="newspace-title">New Space</h2>
+                <p class="lead">Create a new space and an account to manage it.</p>
+
+                <div class="field">
+                    <label for="spaceName">Space Name <span class="muted">(required)</span></label>
+                    <input id="spaceName" name="spaceName" type="text" placeholder="e.g. marketing, product-team"
+                        required />
+                </div>
+
+                <div class="field">
+                    <label for="emailCreate">Email Address</label>
+                    <input id="emailCreate" name="emailCreate" type="email" placeholder="your@email.com" required />
+                </div>
+
+                <div class="field">
+                    <label for="passwordCreate">Password</label>
+                    <div class="pw-field">
+                        <input id="passwordCreate" name="passwordCreate" type="password"
+                            placeholder="Create a secure password" aria-describedby="pwHelp" required />
+                        <button type="button" class="pw-eye" id="togglePwCreate" aria-pressed="false"
+                            aria-label="Show password" title="Show password">
+                            <!-- eye icon (shown when password is hidden) -->
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="pwHelp" class="muted small">Use at least 8 characters, mix letters and numbers.</div>
+                    <div class="strength" aria-hidden="true"><i id="pwBar"></i></div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-slate" type="button"
+                        onclick="document.getElementById('createSpaceForm').reset();">Reset</button>
+                    <button class="btn btn-blue" type="submit">Create Space</button>
+                </div>
+            </form>
+
+            <!-- divider -->
+            <div class="divider" role="separator" aria-hidden="true"></div>
+
+            <!-- Right: Existing Account -->
+            <form class="panel" id="existingForm" aria-labelledby="existing-title" autocomplete="on" novalidate
+                style="grid-area: right;">
+                <h2 id="existing-title">Existing Account</h2>
+                <p class="lead">Send a secure login link to access an existing space — no password required.</p>
+
+                <div class="field">
+                    <label for="emailExisting">Email Address</label>
+                    <input id="emailExisting" name="emailExisting" type="email" placeholder="your@email.com" required />
+                </div>
+
+                <div class="secure-box" role="region" aria-label="secure login explanation">
+                    <strong>Secure Login</strong>
+                    <p class="muted small" style="margin:8px 0 0;">We'll email a one-time secure login link. Links
+                        expire shortly for your protection.</p>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-rose" type="button"
+                        onclick="document.getElementById('existingForm').reset();">Cancel</button>
+                    <button class="btn btn-amber" type="submit">Send Login Link</button>
+                </div>
+            </form>
+        </section>
+
+        <script>
+            // Small interactive helpers: password show/hide & strength indicator + form submit demo
+            (function () {
+                const pw = document.getElementById('passwordCreate');
+                const toggle = document.getElementById('togglePwCreate');
+                const bar = document.getElementById('pwBar');
+
+                // inline SVGs for eye and eye-off
+                const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+                const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-6.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.26 20.26 0 0 1-4.87 6.82M1 1l22 22"></path></svg>';
+
+                toggle.addEventListener('click', () => {
+                    const hidden = pw.getAttribute('type') === 'password';
+                    pw.setAttribute('type', hidden ? 'text' : 'password');
+                    toggle.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+                    toggle.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+                    toggle.title = hidden ? 'Hide password' : 'Show password';
+                    toggle.innerHTML = hidden ? EYE_OFF : EYE;
+                });
+
+                function strengthScore(s) {
+                    let score = 0;
+                    if (!s) return 0;
+                    if (s.length >= 8) score += 1;
+                    if (/[a-z]/.test(s) && /[A-Z]/.test(s)) score += 1;
+                    if (/\d/.test(s)) score += 1;
+                    if (/[\W_]/.test(s)) score += 1;
+                    return score; // 0..4
+                }
+
+                pw.addEventListener('input', () => {
+                    const s = strengthScore(pw.value);
+                    const percent = (s / 4) * 100;
+                    bar.style.width = percent + '%';
+
+                    // color by strength
+                    if (s <= 1) bar.style.background = 'linear-gradient(90deg,#ff5b5b,#ff7a7a)';
+                    else if (s === 2) bar.style.background = 'linear-gradient(90deg,#ffb86b,#ffd36b)';
+                    else if (s === 3) bar.style.background = 'linear-gradient(90deg,#9be07a,#5bd36b)';
+                    else bar.style.background = 'linear-gradient(90deg,#3fe1a3,#2db67d)';
+                });
+
+                // Demo submit handlers (prevent real submits)
+                document.getElementById('createSpaceForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('spaceName').value.trim();
+                    if (!name) {
+                        alert('Please enter a space name.');
+                        return;
+                    }
+                    // TODO: call your API
+                    alert('Create Space submitted — integrate API call here.');
+                });
+
+                document.getElementById('existingForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('emailExisting').value.trim();
+                    if (!email) {
+                        alert('Please enter an email to receive the login link.');
+                        return;
+                    }
+                    // TODO: call your API
+                    alert('Login link request submitted — integrate API call here.');
+                });
+            })();
+
+            // Theme toggle
+            (function () {
+                const root = document.documentElement;
+                const btn = document.getElementById('themeToggle');
+                if (!btn) return;
+
+                function currentPrefersDark() {
+                    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+
+                function setButton(stateDark) {
+                    btn.textContent = stateDark ? '☀️' : '🌙';
+                    btn.setAttribute('aria-pressed', String(stateDark));
+                }
+
+                function applyTheme(theme) {
+                    if (theme === 'light' || theme === 'dark') {
+                        root.setAttribute('data-theme', theme);
+                        setButton(theme === 'dark');
+                    } else {
+                        root.removeAttribute('data-theme'); // fall back to system
+                        setButton(currentPrefersDark());
+                    }
+                }
+
+                // init from storage or system
+                const saved = localStorage.getItem('theme');
+                applyTheme(saved);
+
+                btn.addEventListener('click', () => {
+                    const current = root.getAttribute('data-theme') || (currentPrefersDark() ? 'dark' : 'light');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    root.setAttribute('data-theme', next);
+                    localStorage.setItem('theme', next);
+                    setButton(next === 'dark');
+                });
+
+                // update button if system preference changes and no manual override
+                if (window.matchMedia) {
+                    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+                    mq.addEventListener?.('change', () => {
+                        if (!localStorage.getItem('theme')) applyTheme(null);
+                    });
+                }
+            })();
+        </script>
+    </div>
+</body>
+
+</html>
