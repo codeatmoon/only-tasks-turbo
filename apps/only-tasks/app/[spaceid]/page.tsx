@@ -20,7 +20,7 @@ export default function SpacePage() {
   const [lastSel] = useLocalStorage<{ projectId?: string; appId?: string }>(`${spaceid}-lastSel`, {})
   const [view, setView] = useLocalStorage<'sheet' | 'kanban' | 'graph'>(`${spaceid}-viewMode`, 'sheet')
   type ThemeState = { theme_name: 'theme-1' | 'theme-2'; mode: 'light' | 'dark'; brand?: 'brand-a' | 'brand-b' | null }
-  const [theme, setTheme] = useState<ThemeState | null>(null)
+  const [, setTheme] = useState<ThemeState | null>(null)
 
   const applyTheme = useCallback((t: { theme_name: string; mode: 'light' | 'dark'; brand?: string | null }) => {
     if (typeof document === 'undefined') return
@@ -115,7 +115,8 @@ export default function SpacePage() {
           setTheme(t)
           applyTheme(t)
         }
-      } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
         // fall back to defaults
         const t: ThemeState = { theme_name: 'theme-1', mode: 'dark', brand: null }
         setTheme(t)
