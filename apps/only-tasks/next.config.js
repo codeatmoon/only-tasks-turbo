@@ -4,7 +4,11 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [],
+    unoptimized: process.env.FIREBASE_BUILD === 'true',
   },
+  // Enable static export only for Firebase builds
+  output: process.env.FIREBASE_BUILD === 'true' ? 'export' : undefined,
+  trailingSlash: process.env.FIREBASE_BUILD === 'true',
   async headers() {
     if (process.env.NODE_ENV !== 'production') return []
     return [
