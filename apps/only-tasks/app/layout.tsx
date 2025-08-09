@@ -1,5 +1,4 @@
 import './globals.css'
-import type { ReactNode } from 'react'
 import Script from 'next/script'
 
 export const metadata = {
@@ -8,7 +7,7 @@ export const metadata = {
 }
 
 // Using 'any' to avoid cross-package ReactNode type incompatibilities in monorepo
-export default function RootLayout({ children }: { children: any }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
