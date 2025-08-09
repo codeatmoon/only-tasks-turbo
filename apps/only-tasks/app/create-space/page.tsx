@@ -21,6 +21,11 @@ export default function CreateSpacePage() {
   // Form states for existing account login
   const [emailExisting, setEmailExisting] = useState('')
   
+  // Email verification states
+  const [pin, setPin] = useState('')
+  const [step, setStep] = useState<'form' | 'verify'>('form')
+  const [verificationId, setVerificationId] = useState('')
+  
   // UI states
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -64,13 +69,21 @@ export default function CreateSpacePage() {
           id: spaceName.trim(),
           name: spaceName.trim(),
           email: emailCreate.trim(),
-          password: passwordCreate
+          password: passwordCreate,
+          verificationId: verificationId || undefined
         })
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create space')
+        if (responseData.requiresVerification) {
+          // User doesn't exist, send verification email
+          await handleSendVerificationPin()
+          return
+        } else {
+          throw new Error(responseData.error || 'Failed to create space')
+        }
       }
 
       // Redirect to the created space
@@ -80,6 +93,87 @@ export default function CreateSpacePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSendVerificationPin = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailCreate.trim(),
+          spaceData: {
+            id: spaceName.trim(),
+            name: spaceName.trim()
+          }
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send verification email')
+      }
+
+      setStep('verify')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send verification email')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyPin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!pin.trim()) {
+      setError('PIN is required')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailCreate.trim(),
+          pin: pin.trim()
+        })
+      })
+
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to verify PIN')
+      }
+
+      // PIN verified, now create the space
+      setVerificationId(responseData.spaceData?.id || 'verified')
+      setStep('form')
+      
+      // Automatically submit the form with verification
+      setTimeout(() => {
+        handleCreateSpace(e)
+      }, 100)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify PIN')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBackToForm = () => {
+    setStep('form')
+    setPin('')
+    setError('')
   }
 
   const handleSendLoginLink = async (e: React.FormEvent) => {
@@ -144,13 +238,16 @@ export default function CreateSpacePage() {
         {/* Header Section */}
         <header className="text-left mb-7 relative">
           <h1 className="text-4xl font-bold mb-3 tracking-tight">
-            Create or Access Your Space
+            {step === 'verify' ? 'Verify Your Email' : 'Create or Access Your Space'}
           </h1>
           <p 
             className="text-base" 
             style={{ color: 'var(--createspace-muted)' }}
           >
-            Set up your new space or log in to an existing one — all in a single page.
+            {step === 'verify' 
+              ? `We've sent a 6-digit PIN to ${emailCreate}. Please enter it below to verify your email address.`
+              : 'Set up your new space or log in to an existing one — all in a single page.'
+            }
           </p>
           
           {/* Theme toggle button */}
@@ -171,12 +268,88 @@ export default function CreateSpacePage() {
           </div>
         </header>
 
-        {/* Main Layout */}
-        <section 
-          className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] items-stretch"
-          style={{ gap: 'var(--createspace-gap)' }}
-          aria-label="Create or access"
-        >
+        {step === 'verify' ? (
+          /* PIN Verification Section */
+          <section className="max-w-md mx-auto">
+            <FormPanel
+              title="Email Verification"
+              subtitle="Enter the 6-digit PIN we sent to your email address to continue."
+              onSubmit={handleVerifyPin}
+            >
+              <div className="flex-1">
+                <div className="mb-4">
+                  <label 
+                    htmlFor="pin" 
+                    className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2"
+                  >
+                    Verification PIN
+                  </label>
+                  <input
+                    type="text"
+                    id="pin"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg 
+                               bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100
+                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                               placeholder-slate-500 dark:placeholder-slate-400 text-center text-xl tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                    disabled={loading}
+                    autoFocus
+                  />
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-center">
+                    PIN expires in 15 minutes
+                  </p>
+                </div>
+
+                <div className="text-center mb-4">
+                  <button
+                    type="button"
+                    onClick={handleSendVerificationPin}
+                    disabled={loading}
+                    className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+                  >
+                    Didn't receive the PIN? Send again
+                  </button>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div 
+                className="mt-auto pt-4 flex gap-3 items-center"
+                style={{ 
+                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderTopColor: 'var(--createspace-border-soft)'
+                }}
+              >
+                <Button variant="slate" onClick={handleBackToForm} disabled={loading}>
+                  Back
+                </Button>
+                <Button 
+                  variant="blue" 
+                  type="submit" 
+                  disabled={loading || pin.length !== 6}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify & Continue'
+                  )}
+                </Button>
+              </div>
+            </FormPanel>
+          </section>
+        ) : (
+          /* Original Main Layout */
+          <section 
+            className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] items-stretch"
+            style={{ gap: 'var(--createspace-gap)' }}
+            aria-label="Create or access"
+          >
           {/* Left Panel: New Space */}
           <FormPanel
             title="New Space"
@@ -330,6 +503,7 @@ export default function CreateSpacePage() {
             </div>
           </FormPanel>
         </section>
+        )}
 
         {/* Error Display */}
         {error && (

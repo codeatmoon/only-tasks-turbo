@@ -355,210 +355,211 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
 
               {/* Form Content */}
               <form onSubmit={handleSubmit} className="p-8">
+                {/* Account Information Section */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Account Information</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                   bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   placeholder-gray-500 dark:placeholder-gray-400"
+                        placeholder="your@email.com"
+                        disabled={loading}
+                        autoFocus
+                      />
+                    </div>
 
-            {/* Account Information Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Account Information</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               placeholder-gray-500 dark:placeholder-gray-400"
-                    placeholder="your@email.com"
-                    disabled={loading}
-                    autoFocus
-                  />
+                    {mode === 'claim' && (
+                      <div>
+                        <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Your Name (optional)
+                        </label>
+                        <input
+                          type="text"
+                          id="ownerName"
+                          value={ownerName}
+                          onChange={(e) => setOwnerName(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     placeholder-gray-500 dark:placeholder-gray-400"
+                          placeholder="Your name"
+                          disabled={loading}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {mode === 'claim' && (
+                    <div className="mt-6">
+                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Password *
+                      </label>
+                      <div className="relative max-w-md">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          id="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     placeholder-gray-500 dark:placeholder-gray-400 pr-12"
+                          placeholder="Create a secure password"
+                          disabled={loading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                        >
+                          {showPassword ? '🙈' : '👁️'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {mode === 'claim' && (
-                  <div>
-                    <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Your Name (optional)
-                    </label>
-                    <input
-                      type="text"
-                      id="ownerName"
-                      value={ownerName}
-                      onChange={(e) => setOwnerName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 placeholder-gray-500 dark:placeholder-gray-400"
-                      placeholder="Your name"
-                      disabled={loading}
-                    />
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Space Configuration</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Space Name *
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     placeholder-gray-500 dark:placeholder-gray-400"
+                          placeholder="Enter space name"
+                          disabled={loading}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Description (optional)
+                        </label>
+                        <textarea
+                          id="description"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          rows={3}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     placeholder-gray-500 dark:placeholder-gray-400 resize-none"
+                          placeholder="Describe your space and its purpose"
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
-              </div>
 
-              {mode === 'claim' && (
-                <div className="mt-6">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Password *
-                  </label>
-                  <div className="relative max-w-md">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 placeholder-gray-500 dark:placeholder-gray-400 pr-12"
-                      placeholder="Create a secure password"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    >
-                      {showPassword ? '🙈' : '👁️'}
-                    </button>
+                {mode === 'login' && (
+                  <div className="text-center py-8">
+                    <div className="max-w-md mx-auto">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
+                        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Secure Login</h3>
+                        <p className="text-blue-700 dark:text-blue-300 text-sm">
+                          We&apos;ll send you a secure login link to access the space. No password required!
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendLoginLink}
+                        disabled={loading || !email.trim()}
+                        className="bg-green-600 text-white px-8 py-4 rounded-xl
+                                   hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed
+                                   transition-colors duration-200 flex items-center justify-center gap-2 mx-auto
+                                   font-semibold"
+                      >
+                        {loading ? (
+                          <>
+                            <LucideLoader size={20} className="animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          'Send Login Link'
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
 
-            {mode === 'claim' && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Space Configuration</h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Space Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 placeholder-gray-500 dark:placeholder-gray-400"
-                      placeholder="Enter space name"
-                      disabled={loading}
-                    />
+                {error && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
                   </div>
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Description (optional)
-                    </label>
-                    <textarea
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 placeholder-gray-500 dark:placeholder-gray-400 resize-none"
-                      placeholder="Describe your space and its purpose"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {mode === 'login' && (
-              <div className="text-center py-8">
-                <div className="max-w-md mx-auto">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
-                    <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Secure Login</h3>
-                    <p className="text-blue-700 dark:text-blue-300 text-sm">
-                      We&apos;ll send you a secure login link to access the space. No password required!
-                    </p>
-                  </div>
+                {/* Actions Section */}
+                <div className="bg-gray-50 dark:bg-gray-800 -m-8 mt-8 px-8 py-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <button
                     type="button"
-                    onClick={handleSendLoginLink}
-                    disabled={loading || !email.trim()}
-                    className="bg-green-600 text-white px-8 py-4 rounded-xl
-                               hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed
-                               transition-colors duration-200 flex items-center justify-center gap-2 mx-auto
-                               font-semibold"
+                    onClick={onCancel}
+                    disabled={loading}
+                    className="w-full sm:w-auto px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 
+                               rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               transition-colors duration-200 font-medium"
                   >
-                    {loading ? (
-                      <>
-                        <LucideLoader size={20} className="animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      'Send Login Link'
-                    )}
+                    Cancel
                   </button>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-                <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
-              </div>
-            )}
-
-            {/* Actions Section */}
-            <div className="bg-gray-50 dark:bg-gray-800 -m-8 mt-8 px-8 py-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={loading}
-                className="w-full sm:w-auto px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 
-                           rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 
-                           disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-colors duration-200 font-medium"
-              >
-                Cancel
-              </button>
-              {mode === 'claim' && (
-                <button
-                  type="submit"
-                  disabled={loading || !name.trim() || !email.trim() || !password}
-                  className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl
-                             hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
-                             transition-colors duration-200 flex items-center justify-center gap-2
-                             font-semibold"
-                >
-                  {loading ? (
-                    <>
-                      <LucideLoader size={20} className="animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    'Claim Space'
-                  )}
-                </button>
-              )}
-
-              {mode === 'login' && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Don&apos;t have an account? 
+                  {mode === 'claim' && (
                     <button
-                      type="button"
-                      onClick={() => setMode('claim')}
-                      className="text-blue-600 dark:text-blue-400 hover:underline ml-1 font-medium"
+                      type="submit"
+                      disabled={loading || !name.trim() || !email.trim() || !password}
+                      className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl
+                                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                                 transition-colors duration-200 flex items-center justify-center gap-2
+                                 font-semibold"
                     >
-                      Claim this space
+                      {loading ? (
+                        <>
+                          <LucideLoader size={20} className="animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        'Claim Space'
+                      )}
                     </button>
-                  </p>
+                  )}
+
+                  {mode === 'login' && (
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Don&apos;t have an account? 
+                        <button
+                          type="button"
+                          onClick={() => setMode('claim')}
+                          className="text-blue-600 dark:text-blue-400 hover:underline ml-1 font-medium"
+                        >
+                          Claim this space
+                        </button>
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </form>
-        )}
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
