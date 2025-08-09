@@ -5,9 +5,10 @@ import TaskTable from '@/components/tasks/TaskTable'
 import KanbanBoard from '@/components/tasks/KanbanBoard'
 import TaskGraph from '@/components/tasks/TaskGraph'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { LucideGrid, LucideSettings, LucideLoader } from 'lucide-react'
+import { LucideSettings, LucideLoader } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import ThemeToggle from '@/components/ThemeToggle'
+import ViewSelector from '@/components/ViewSelector'
 
 export default function SpacePage() {
   const router = useRouter()
@@ -221,10 +222,7 @@ export default function SpacePage() {
     }
   }
 
-  const cycleView = () => {
-    const next = view === 'sheet' ? 'kanban' : view === 'kanban' ? 'graph' : 'sheet'
-    setView(next)
-  }
+
 
   // Show loading state
   if (loading) {
@@ -267,13 +265,7 @@ export default function SpacePage() {
               >
                 <LucideSettings size={16} />
               </button>
-              <button
-                onClick={cycleView}
-                className="icon-btn"
-                title={`Toggle View (Current: ${view})`}
-              >
-                <LucideGrid size={16} />
-              </button>
+              <ViewSelector currentView={view} onViewChange={setView} />
               <ThemeToggle />
             </div>
           </header>
