@@ -310,7 +310,7 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                     disabled={loading}
                     className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
                   >
-                    Didn't receive the PIN? Send again
+                    Didn&apos;t receive the PIN? Send again
                   </button>
                 </div>
               </div>
