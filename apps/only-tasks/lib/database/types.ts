@@ -20,6 +20,16 @@ export interface DbAuthToken {
   created_at: Date
 }
 
+export interface DbEmailVerification {
+  id: string
+  email: string
+  pin: string
+  expires_at: Date
+  verified: boolean
+  space_data?: string // JSON string containing space creation data
+  created_at: Date
+}
+
 export interface DbSpace {
   id: string
   name: string
@@ -102,6 +112,12 @@ export interface Database {
   createAuthToken(token: Omit<DbAuthToken, 'created_at'>): Promise<DbAuthToken>
   getAuthToken(token: string): Promise<DbAuthToken | null>
   markTokenUsed(tokenId: string): Promise<void>
+
+  // Email verification operations
+  createEmailVerification(verification: Omit<DbEmailVerification, 'created_at'>): Promise<DbEmailVerification>
+  getEmailVerification(email: string, pin: string): Promise<DbEmailVerification | null>
+  markEmailVerified(verificationId: string): Promise<void>
+  getEmailVerificationByEmail(email: string): Promise<DbEmailVerification | null>
 
   // Space operations
   getSpace(spaceId: string): Promise<DbSpace | null>

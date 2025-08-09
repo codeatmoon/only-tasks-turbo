@@ -22,6 +22,17 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Email verification table - for verifying email addresses with PIN
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id VARCHAR(255) PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  pin VARCHAR(6) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  verified BOOLEAN DEFAULT FALSE,
+  space_data JSONB, -- Store space creation data temporarily
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Spaces table - each space is a workspace
 CREATE TABLE IF NOT EXISTS spaces (
   id VARCHAR(255) PRIMARY KEY,
@@ -114,6 +125,8 @@ CREATE TABLE IF NOT EXISTS app_options (
 CREATE INDEX IF NOT EXISTS idx_global_users_email ON global_users(email);
 CREATE INDEX IF NOT EXISTS idx_auth_tokens_token ON auth_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_auth_tokens_user_id ON auth_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_email ON email_verifications(email);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_pin ON email_verifications(pin);
 CREATE INDEX IF NOT EXISTS idx_spaces_owner_id ON spaces(owner_id);
 CREATE INDEX IF NOT EXISTS idx_users_space_id ON users(space_id);
 CREATE INDEX IF NOT EXISTS idx_users_user_id ON users(user_id);

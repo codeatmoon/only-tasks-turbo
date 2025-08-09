@@ -54,3 +54,24 @@ export async function sendLoginTokenEmail(email: string, token: string, spaceId:
 
   await transporter.sendMail(mailOptions)
 }
+
+export async function sendEmailVerificationPin(email: string, pin: string, spaceId: string) {
+  const mailOptions = {
+    from: 'noreply@only-tasks.com',
+    to: email,
+    subject: `Email Verification for Space "${spaceId}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Email Verification</h2>
+        <p>To verify your email and create space "${spaceId}", please use the following 6-digit PIN:</p>
+        <div style="background: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+          <h1 style="font-size: 32px; letter-spacing: 8px; margin: 0; color: #007bff;">${pin}</h1>
+        </div>
+        <p>This PIN will expire in 15 minutes.</p>
+        <p>If you didn't request this verification, you can ignore this email.</p>
+      </div>
+    `
+  }
+
+  await transporter.sendMail(mailOptions)
+}

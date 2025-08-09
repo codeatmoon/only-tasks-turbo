@@ -3,6 +3,7 @@ import {
   Database,
   DbGlobalUser,
   DbAuthToken,
+  DbEmailVerification,
   DbSpace,
   DbUser,
   DbProject,
@@ -121,6 +122,60 @@ export class PostgresDatabase implements Database {
         'UPDATE auth_tokens SET used = TRUE WHERE id = $1',
         [tokenId]
       )
+    } finally {
+      client.release()
+    }
+  }
+
+  // Email verification operations
+  async createEmailVerification(verification: Omit<DbEmailVerification, 'created_at'>): Promise<DbEmailVerification> {
+    const client = await this.pool.connect()
+    try {
+      const result = await client.query(
+        `INSERT INTO email_verifications (id, email, pin, expires_at, verified, space_data) 
+         VALUES ($1, $2, $3, $4, $5, $6) 
+         RETURNING *`,
+        [verification.id, verification.email, verification.pin, verification.expires_at, verification.verified, verification.space_data]
+      )
+      return result.rows[0]
+    } finally {
+      client.release()
+    }
+  }
+
+  async getEmailVerification(email: string, pin: string): Promise<DbEmailVerification | null> {
+    const client = await this.pool.connect()
+    try {
+      const result = await client.query(
+        'SELECT * FROM email_verifications WHERE email = $1 AND pin = $2 AND verified = FALSE AND expires_at > NOW()',
+        [email, pin]
+      )
+      return result.rows[0] || null
+    } finally {
+      client.release()
+    }
+  }
+
+  async markEmailVerified(verificationId: string): Promise<void> {
+    const client = await this.pool.connect()
+    try {
+      await client.query(
+        'UPDATE email_verifications SET verified = TRUE WHERE id = $1',
+        [verificationId]
+      )
+    } finally {
+      client.release()
+    }
+  }
+
+  async getEmailVerificationByEmail(email: string): Promise<DbEmailVerification | null> {
+    const client = await this.pool.connect()
+    try {
+      const result = await client.query(
+        'SELECT * FROM email_verifications WHERE email = $1 AND verified = FALSE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1',
+        [email]
+      )
+      return result.rows[0] || null
     } finally {
       client.release()
     }

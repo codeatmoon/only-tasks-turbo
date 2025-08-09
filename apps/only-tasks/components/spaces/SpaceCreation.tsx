@@ -16,10 +16,13 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [ownerName, setOwnerName] = useState('')
+  const [pin, setPin] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [mode, setMode] = useState<'claim' | 'login'>('claim')
+  const [step, setStep] = useState<'form' | 'verify'>('form')
+  const [verificationId, setVerificationId] = useState('')
 
   // Update name when spaceId changes (for prefilling from URL)
   useEffect(() => {
@@ -60,13 +63,21 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
           description: description.trim() || undefined,
           email: email.trim(),
           password: mode === 'claim' ? password : undefined,
-          ownerName: ownerName.trim() || undefined
+          ownerName: ownerName.trim() || undefined,
+          verificationId: verificationId || undefined
         })
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create space')
+        if (responseData.requiresVerification) {
+          // User doesn't exist, send verification email
+          await handleSendVerificationPin()
+          return
+        } else {
+          throw new Error(responseData.error || 'Failed to create space')
+        }
       }
 
       onSpaceCreated()
@@ -75,6 +86,89 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSendVerificationPin = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          spaceData: {
+            id: spaceId || name.trim(),
+            name: name.trim(),
+            description: description.trim() || undefined,
+            ownerName: ownerName.trim() || undefined
+          }
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send verification email')
+      }
+
+      setStep('verify')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send verification email')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyPin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!pin.trim()) {
+      setError('PIN is required')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          pin: pin.trim()
+        })
+      })
+
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to verify PIN')
+      }
+
+      // PIN verified, now create the space
+      setVerificationId(responseData.spaceData?.id || 'verified')
+      setStep('form')
+      
+      // Automatically submit the form with verification
+      setTimeout(() => {
+        handleSubmit(e)
+      }, 100)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify PIN')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBackToForm = () => {
+    setStep('form')
+    setPin('')
+    setError('')
   }
 
   const handleSendLoginLink = async () => {
@@ -120,55 +214,147 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
             <LucidePlus size={40} className="text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            {isPage ? 'Create Your Space' : 'Create New Space'}
+            {step === 'verify' 
+              ? 'Verify Your Email' 
+              : (isPage ? 'Create Your Space' : 'Create New Space')
+            }
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {isPage 
-              ? (spaceId ? `Set up your space "${spaceId}" and start organizing your tasks` : 'Set up your personalized workspace and start organizing your tasks')
-              : `Space "${spaceId}" doesn't exist yet. Let's create it and get you started!`
+            {step === 'verify'
+              ? `We've sent a 6-digit PIN to ${email}. Please enter it below to verify your email address.`
+              : (isPage 
+                ? (spaceId ? `Set up your space "${spaceId}" and start organizing your tasks` : 'Set up your personalized workspace and start organizing your tasks')
+                : `Space "${spaceId}" doesn't exist yet. Let's create it and get you started!`
+              )
             }
           </p>
         </div>
 
         {/* Main Form Container */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-lg overflow-hidden">
-          {/* Mode Selection Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 px-8 py-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Choose Your Approach</h2>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setMode('claim')}
-                className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
-                  mode === 'claim' 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="font-semibold">Claim Space</div>
-                  <div className="text-xs opacity-80 mt-1">Create a new account and claim ownership</div>
+          {step === 'verify' ? (
+            /* PIN Verification Form */
+            <form onSubmit={handleVerifyPin} className="p-8">
+              <div className="max-w-md mx-auto">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
+                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Email Verification</h3>
+                  <p className="text-blue-700 dark:text-blue-300 text-sm">
+                    Enter the 6-digit PIN we sent to your email address to continue.
+                  </p>
                 </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('login')}
-                className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
-                  mode === 'login' 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="font-semibold">Already Have Account</div>
-                  <div className="text-xs opacity-80 mt-1">Send me a secure login link</div>
-                </div>
-              </button>
-            </div>
-          </div>
 
-          {/* Form Content */}
-          <form onSubmit={handleSubmit} className="p-8">
+                <div className="mb-6">
+                  <label htmlFor="pin" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Verification PIN
+                  </label>
+                  <input
+                    type="text"
+                    id="pin"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                               placeholder-gray-500 dark:placeholder-gray-400 text-center text-xl tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                    disabled={loading}
+                    autoFocus
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                    PIN expires in 15 minutes
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={handleBackToForm}
+                    disabled={loading}
+                    className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 
+                               rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               transition-colors duration-200 font-medium"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading || pin.length !== 6}
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-xl
+                               hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                               transition-colors duration-200 flex items-center justify-center gap-2
+                               font-semibold"
+                  >
+                    {loading ? (
+                      <>
+                        <LucideLoader size={20} className="animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      'Verify & Continue'
+                    )}
+                  </button>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <button
+                    type="button"
+                    onClick={handleSendVerificationPin}
+                    disabled={loading}
+                    className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+                  >
+                    Didn't receive the PIN? Send again
+                  </button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            /* Original Space Creation Form */
+            <>
+              {/* Mode Selection Section */}
+              <div className="bg-gray-50 dark:bg-gray-800 px-8 py-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Choose Your Approach</h2>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setMode('claim')}
+                    className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
+                      mode === 'claim' 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">Claim Space</div>
+                      <div className="text-xs opacity-80 mt-1">Create a new account and claim ownership</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
+                      mode === 'login' 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold">Already Have Account</div>
+                      <div className="text-xs opacity-80 mt-1">Send me a secure login link</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Form Content */}
+              <form onSubmit={handleSubmit} className="p-8">
 
             {/* Account Information Section */}
             <div className="mb-8">
@@ -372,7 +558,7 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
               )}
             </div>
           </form>
-        </div>
+        )}
       </div>
     </div>
   )
