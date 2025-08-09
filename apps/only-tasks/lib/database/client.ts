@@ -3,11 +3,9 @@ import { PostgresDatabase } from './postgres'
 
 let dbInstance: Database | null = null
 
-const DIRECT_URL = "postgresql://postgres.sbccoooiaanzamgqglhd:JtBLT51UWPYTHjpp@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
-
 export function createDatabase(connectionString?: string): Database {
   if (!connectionString) {
-    connectionString = process.env.DATABASE_URL || DIRECT_URL
+    connectionString = process.env.DATABASE_URL
   }
 
   // Create PostgreSQL instance (easily extensible for other databases)
