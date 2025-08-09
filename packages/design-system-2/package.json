@@ -1,0 +1,23 @@
+{
+  "name": "@scss-theming/design-system-2",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CSS Custom Properties Design System",
+  "main": "index.js",
+  "exports": {
+    "./scss": "./scss/index.scss",
+    "./scss/index.scss": "./scss/index.scss",
+    "./themes/*": "./scss/themes/*.scss",
+    "./dist/*": "./dist/*",
+    "./dist/index.css": "./dist/index.css"
+  },
+  "scripts": {
+    "build": "sass scss:dist --style=compressed",
+    "dev": "sass scss:dist --watch",
+    "lint": "echo 'No linting for SCSS files'",
+    "check-types": "echo 'No type checking for SCSS files'"
+  },
+  "devDependencies": {
+    "sass": "^1.89.2"
+  }
+}

@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+.next/static/
+.next/cache/
+out/
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Locks
+yarn.lock
+pnpm-lock.yaml
+
+# Tests
+coverage/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/**
+!.vscode/extensions.json
+.idea/

@@ -1,0 +1,92 @@
+// Theme 2 - Elegant/Premium Theme with nested brand classes and light/dark mode support
+.theme-2 {
+  --accent-color: #805ad5;
+  
+  // Typography - Elegant, readable fonts
+  --font-family-primary: var(--font-playfair), 'Georgia', serif;
+  --font-family-secondary: var(--font-source-sans), 'Helvetica', sans-serif;
+  --font-family-mono: var(--font-jetbrains-mono), 'Monaco', monospace;
+  
+  // Spacing - Generous, luxurious spacing
+  --spacing-xs: 0.375rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1.25rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 2.5rem;
+  --spacing-2xl: 3.5rem;
+  --spacing-3xl: 5rem;
+  
+  // Border Radius - Soft, rounded edges
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  
+  // Component specific - Spacious, premium feel
+  --button-padding-sm: var(--spacing-sm) var(--spacing-lg);
+  --button-padding-md: var(--spacing-md) var(--spacing-xl);
+  --button-padding-lg: var(--spacing-xl) var(--spacing-2xl);
+  --card-padding: var(--spacing-2xl);
+  --navbar-height: 4.5rem;
+  
+  // Transitions - Smooth, elegant
+  --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // Light mode specific
+  &.light-mode {
+    --primary-color: #2d3748;
+    --secondary-color: #edf2f7;
+    --text-color: #1a202c;
+    --background-color: #f7fafc;
+    --border-color: #cbd5e0;
+    --surface-color: #ffffff;
+    --surface-secondary: #f7fafc;
+  }
+  
+  // Dark mode specific
+  &.dark-mode {
+    --primary-color: #f1f3f4;
+    --secondary-color: #1a1a1a;
+    --text-color: #e2e8f0;
+    --background-color: #1a1a2e;
+    --border-color: #3c4043;
+    --surface-color: #16213e;
+    --surface-secondary: #0f172a;
+  }
+  
+  // Brand A - Luxury Red theme
+  &.brand-a {
+    --brand-accent: #e53e3e;
+    --accent-color: #e53e3e;
+    --brand-highlight: #c53030;
+    
+    // Brand-specific typography - More dramatic
+    --font-family-primary: var(--font-crimson), 'Playfair Display', serif;
+    --font-weight-bold: 700;
+    
+    // Brand-specific spacing (extra luxurious)
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+    --card-padding: var(--spacing-3xl);
+  }
+  
+  // Brand B - Ocean Blue theme
+  &.brand-b {
+    --brand-accent: #38b2ac;
+    --accent-color: #38b2ac;
+    --brand-highlight: #2c7a7b;
+    
+    // Brand-specific typography - Clean and modern
+    --font-family-primary: var(--font-lora), 'Georgia', serif;
+    --font-family-secondary: var(--font-source-sans), sans-serif;
+    
+    // Brand-specific radius (very rounded)
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-2xl: 2rem;
+  }
+}

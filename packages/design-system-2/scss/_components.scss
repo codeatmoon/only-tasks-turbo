@@ -1,0 +1,214 @@
+// Components using CSS Custom Properties with comprehensive theming support
+.btn {
+  padding: var(--button-padding-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  &.btn-sm {
+    padding: var(--button-padding-sm);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  &.btn-lg {
+    padding: var(--button-padding-lg);
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-weight-bold);
+  }
+
+  &.btn-secondary {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+
+    &:hover {
+      background-color: var(--accent-color);
+      color: var(--secondary-color);
+    }
+  }
+
+  &.btn-accent {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--secondary-color);
+
+    &:hover {
+      background-color: var(--brand-highlight);
+      border-color: var(--brand-highlight);
+    }
+  }
+
+  &.btn-brand {
+    background-color: var(--brand-accent);
+    border-color: var(--brand-accent);
+    color: var(--secondary-color);
+    font-weight: var(--font-weight-bold);
+
+    &:hover {
+      background-color: var(--brand-highlight);
+      border-color: var(--brand-highlight);
+    }
+  }
+}
+
+.card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  font-family: var(--font-family-primary);
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .card-title {
+    color: var(--text-primary);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--spacing-lg);
+    font-family: var(--font-family-primary);
+  }
+
+  .card-content {
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    font-family: var(--font-family-secondary);
+  }
+
+  .card-footer {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+  }
+
+  &.card-branded {
+    border-left: 4px solid var(--brand-accent);
+
+    .card-title {
+      color: var(--brand-accent);
+    }
+  }
+
+  &.card-compact {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    
+    .card-title {
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-md);
+    }
+  }
+}
+
+.navbar {
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  height: var(--navbar-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-family-primary);
+
+  .navbar-brand {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--brand-accent, var(--text-primary));
+    font-family: var(--font-family-primary);
+  }
+
+  .navbar-nav {
+    display: flex;
+    gap: var(--spacing-xl);
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-base);
+
+      &:hover {
+        color: var(--accent-color);
+        background-color: var(--surface-secondary);
+      }
+
+      &.nav-link-brand {
+        color: var(--brand-accent);
+        font-weight: var(--font-weight-semibold);
+
+        &:hover {
+          color: var(--brand-highlight);
+          background-color: var(--surface-secondary);
+        }
+      }
+    }
+  }
+}
+
+// Typography utilities
+.heading-1 {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+.heading-2 {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+.heading-3 {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+}
+
+.body-text {
+  font-family: var(--font-family-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-secondary);
+}
+
+.code-text {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  background-color: var(--surface-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}

@@ -1,0 +1,90 @@
+// Theme 1 - Modern Tech Theme with nested brand classes and light/dark mode support
+.theme-1 {
+  --accent-color: #007bff;
+  
+  // Typography - Modern, clean fonts
+  --font-family-primary: var(--font-inter), 'Segoe UI', system-ui, sans-serif;
+  --font-family-secondary: var(--font-inter), -apple-system, sans-serif;
+  --font-family-mono: var(--font-jetbrains-mono), 'Fira Code', monospace;
+  
+  // Spacing - Compact, modern spacing
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.875rem;
+  --spacing-lg: 1.25rem;
+  --spacing-xl: 1.75rem;
+  --spacing-2xl: 2.5rem;
+  --spacing-3xl: 3.5rem;
+  
+  // Border Radius - Sharp, modern edges
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  
+  // Component specific - Tight, compact design
+  --button-padding-sm: var(--spacing-sm) var(--spacing-md);
+  --button-padding-md: var(--spacing-md) var(--spacing-lg);
+  --button-padding-lg: var(--spacing-lg) var(--spacing-xl);
+  --card-padding: var(--spacing-xl);
+  --navbar-height: 3.5rem;
+  
+  // Transitions - Snappy, quick
+  --transition-fast: 120ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 280ms ease-out;
+  
+  // Light mode specific
+  &.light-mode {
+    --primary-color: #1a1a1a;
+    --secondary-color: #f5f5f5;
+    --text-color: #2c2c2c;
+    --background-color: #ffffff;
+    --border-color: #e0e0e0;
+    --surface-color: #ffffff;
+    --surface-secondary: #f8f9fa;
+  }
+  
+  // Dark mode specific
+  &.dark-mode {
+    --primary-color: #e8e8e8;
+    --secondary-color: #1f1f1f;
+    --text-color: #e0e0e0;
+    --background-color: #0d1117;
+    --border-color: #30363d;
+    --surface-color: #161b22;
+    --surface-secondary: #21262d;
+  }
+  
+  // Brand A - Orange/Red theme
+  &.brand-a {
+    --brand-accent: #ff6b35;
+    --accent-color: #ff6b35;
+    --brand-highlight: #ff4500;
+    
+    // Brand-specific typography
+    --font-family-primary: var(--font-poppins), 'Inter', sans-serif;
+    --font-weight-bold: 800; // Extra bold for impact
+    
+    // Brand-specific spacing (slightly more generous)
+    --button-padding-md: var(--spacing-lg) var(--spacing-xl);
+    --card-padding: var(--spacing-2xl);
+  }
+  
+  // Brand B - Green theme
+  &.brand-b {
+    --brand-accent: #28a745;
+    --accent-color: #28a745;
+    --brand-highlight: #006400;
+    
+    // Brand-specific typography
+    --font-family-primary: var(--font-roboto), 'Inter', sans-serif;
+    --font-weight-bold: 700;
+    
+    // Brand-specific radius (more rounded)
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+  }
+}
