@@ -5,7 +5,7 @@ let dbInstance: Database | null = null
 
 export function createDatabase(connectionString?: string): Database {
   if (!connectionString) {
-    connectionString = process.env.DATABASE_URL
+    connectionString = process.env.DATABASE_URL || "postgresql://postgres.sbccoooiaanzamgqglhd:JtBLT51UWPYTHjpp@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
   }
 
   // Create PostgreSQL instance (easily extensible for other databases)
