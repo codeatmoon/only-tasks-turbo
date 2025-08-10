@@ -1,5 +1,6 @@
 import "./globals.css";
 import Script from "next/script";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata = {
   title: "Task Tracker",
@@ -26,7 +27,11 @@ export default function RootLayout({
           })();
         `}</Script>
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

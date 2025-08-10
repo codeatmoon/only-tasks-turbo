@@ -9,13 +9,19 @@ import { LucideSettings, LucideLoader } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 import ViewSelector from "@/components/ViewSelector";
+import { useAuth } from "@/lib/auth-context";
+import { createAuthenticatedFetch } from "@/lib/auth-utils";
+import LoginForm from "@/components/auth/LoginForm";
 
 export default function SpacePage() {
   const router = useRouter();
   const params = useParams();
   const spaceid = params.spaceid as string;
+  const { user, loading: authLoading } = useAuth();
+  const authenticatedFetch = createAuthenticatedFetch();
 
   const [spaceExists, setSpaceExists] = useState<boolean | null>(null);
+  const [userOwnsSpace, setUserOwnsSpace] = useState<boolean | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastSel] = useLocalStorage<{ projectId?: string; appId?: string }>(
@@ -64,7 +70,7 @@ export default function SpacePage() {
     [],
   );
 
-  // Check for authentication token on load
+  // Check for magic link token on load
   useEffect(() => {
     const checkToken = async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -93,49 +99,73 @@ export default function SpacePage() {
     checkToken();
   }, [spaceid]);
 
-  // Check if space exists and load data
-  const checkSpaceAndLoadData = useCallback(async () => {
+  // Check space access and ownership
+  const checkSpaceAccess = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      // Check if space exists
-      const spaceResponse = await fetch(`/api/spaces?id=${spaceid}`);
+      // Check if space exists and if user owns it
+      const spaceResponse = await authenticatedFetch(`/api/spaces?id=${spaceid}`);
 
       if (spaceResponse.ok) {
-        // Space exists, load projects
         setSpaceExists(true);
-        const projectsResponse = await fetch(`/api/spaces/${spaceid}/projects`);
-
-        if (projectsResponse.ok) {
-          const { projects } = await projectsResponse.json();
-          setProjects(projects);
+        
+        // Check if the authenticated user owns the space
+        // We'll compare the Firebase UID with the space owner
+        const ownershipResponse = await authenticatedFetch(`/api/spaces/${spaceid}/ownership`);
+        if (ownershipResponse.ok) {
+          const { owns } = await ownershipResponse.json();
+          setUserOwnsSpace(owns);
+          
+          if (owns) {
+            // Load projects if user owns the space
+            const projectsResponse = await authenticatedFetch(`/api/spaces/${spaceid}/projects`);
+            if (projectsResponse.ok) {
+              const { projects } = await projectsResponse.json();
+              setProjects(projects);
+            } else {
+              console.error("Failed to load projects");
+              setProjects([]);
+            }
+          }
         } else {
-          console.error("Failed to load projects");
-          setProjects([]);
+          setUserOwnsSpace(false);
         }
       } else if (spaceResponse.status === 404) {
         // Space doesn't exist
         setSpaceExists(false);
+        setUserOwnsSpace(false);
       } else {
         console.error("Error checking space");
         setSpaceExists(false);
+        setUserOwnsSpace(false);
       }
     } catch (error) {
-      console.error("Error loading space data:", error);
+      console.error("Error checking space access:", error);
       setSpaceExists(false);
+      setUserOwnsSpace(false);
     } finally {
       setLoading(false);
     }
-  }, [spaceid]);
+  }, [spaceid, user, authenticatedFetch]);
 
   useEffect(() => {
-    checkSpaceAndLoadData();
-  }, [checkSpaceAndLoadData]);
+    if (!authLoading) {
+      checkSpaceAccess();
+    }
+  }, [checkSpaceAccess, authLoading]);
 
   // Load and apply theme
   useEffect(() => {
     const loadTheme = async () => {
+      if (!user || !userOwnsSpace) return;
+      
       try {
-        const res = await fetch(`/api/spaces/${spaceid}/theme`);
+        const res = await authenticatedFetch(`/api/spaces/${spaceid}/theme`);
         if (res.ok) {
           const { theme } = await res.json();
           const defaultTheme: ThemeState = {
@@ -167,14 +197,7 @@ export default function SpacePage() {
     };
     loadTheme();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spaceid]);
-
-  // Redirect to create-space page if space doesn't exist
-  useEffect(() => {
-    if (spaceExists === false) {
-      router.push(`/create-space?space=${encodeURIComponent(spaceid)}`);
-    }
-  }, [spaceExists, spaceid, router]);
+  }, [spaceid, user, userOwnsSpace]);
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === lastSel.projectId) ?? projects[0];
@@ -204,16 +227,15 @@ export default function SpacePage() {
 
       // Sync with database
       try {
-        // The updater function gives us the new app state, but we need to identify what changed
-        // For now, we'll just reload the data to ensure consistency
-        await checkSpaceAndLoadData();
+        // Reload data to ensure consistency
+        await checkSpaceAccess();
       } catch (error) {
         console.error("Failed to sync with database:", error);
         // Revert local changes on error
-        checkSpaceAndLoadData();
+        checkSpaceAccess();
       }
     },
-    [projects, currentProject, currentApp, setProjects, checkSpaceAndLoadData],
+    [projects, currentProject, currentApp, setProjects, checkSpaceAccess],
   );
 
   const onCreateTask = useCallback(
@@ -222,7 +244,7 @@ export default function SpacePage() {
 
       try {
         // Create task in database first
-        const response = await fetch(`/api/spaces/${spaceid}/tasks`, {
+        const response = await authenticatedFetch(`/api/spaces/${spaceid}/tasks`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -251,7 +273,7 @@ export default function SpacePage() {
         alert("Failed to create task. Please try again.");
       }
     },
-    [updateCurrentApp, currentApp, currentProject, spaceid],
+    [updateCurrentApp, currentApp, currentProject, spaceid, authenticatedFetch],
   );
 
   const onEditTask = async (
@@ -261,7 +283,7 @@ export default function SpacePage() {
   ) => {
     try {
       // Update task in database first
-      const response = await fetch(`/api/spaces/${spaceid}/tasks/${taskId}`, {
+      const response = await authenticatedFetch(`/api/spaces/${spaceid}/tasks/${taskId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -293,8 +315,8 @@ export default function SpacePage() {
     }
   };
 
-  // Show loading state
-  if (loading) {
+  // Show loading state while checking auth
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
@@ -308,19 +330,36 @@ export default function SpacePage() {
     );
   }
 
-  // Show space creation if space doesn't exist
+  // Show login form if not authenticated or doesn't own space
+  if (!user || userOwnsSpace === false) {
+    return (
+      <LoginForm 
+        spaceId={spaceid} 
+        onSuccess={() => {
+          // Refresh the page after successful login
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  // Show message if space doesn't exist
   if (spaceExists === false) {
-    // Redirect is handled by useEffect above
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <LucideLoader
-            size={48}
-            className="animate-spin text-blue-600 mx-auto mb-4"
-          />
-          <p className="text-gray-600 dark:text-gray-400">
-            Redirecting to space creation...
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Space Not Found
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            The space &quot;{spaceid}&quot; does not exist.
           </p>
+          <button
+            onClick={() => router.push("/")}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go Home
+          </button>
         </div>
       </div>
     );

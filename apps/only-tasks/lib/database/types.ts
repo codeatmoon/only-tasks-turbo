@@ -6,6 +6,7 @@ export interface DbGlobalUser {
   email: string;
   password_hash?: string;
   name?: string;
+  firebase_uid?: string;
   created_at: Date;
   updated_at: Date;
 }

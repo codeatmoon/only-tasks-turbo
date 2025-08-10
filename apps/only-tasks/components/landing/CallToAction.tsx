@@ -21,10 +21,6 @@ export default function CallToAction() {
     router.push("/demo");
   };
 
-  const navigateToCreateSpace = () => {
-    router.push("/create-space");
-  };
-
   return (
     <section className="relative py-24 sm:py-32 bg-slate-50 dark:bg-slate-900">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -78,10 +74,10 @@ export default function CallToAction() {
               </button>
 
               <button
-                onClick={navigateToCreateSpace}
+                onClick={navigateToDemo}
                 className="group inline-flex items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-lg transition-all duration-200 hover:bg-slate-100 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900"
               >
-                Get Started Free
+                Try Demo Now
                 <LucideArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </button>
             </div>

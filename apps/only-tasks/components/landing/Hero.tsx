@@ -13,10 +13,6 @@ export default function Hero() {
     router.push("/demo");
   };
 
-  const navigateToCreateSpace = () => {
-    router.push("/create-space");
-  };
-
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
       {/* Background Pattern */}
@@ -58,10 +54,10 @@ export default function Hero() {
             </button>
 
             <button
-              onClick={navigateToCreateSpace}
+              onClick={navigateToDemo}
               className="group inline-flex items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-lg ring-1 ring-slate-200 transition-all duration-200 hover:bg-slate-50 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:bg-slate-800 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-700"
             >
-              Get Started Free
+              Try Demo Now
               <LucideArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
