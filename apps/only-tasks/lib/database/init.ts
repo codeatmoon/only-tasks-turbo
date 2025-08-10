@@ -1,6 +1,15 @@
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync } from 'fs'
 import { join } from 'path'
 import { getDatabase } from './client'
+
+// Types for PostgreSQL query results
+interface TableRow {
+  table_name: string
+}
+
+interface ColumnRow {
+  column_name: string
+}
 
 export async function initializeSchema(): Promise<void> {
   const db = getDatabase()
@@ -17,16 +26,14 @@ export async function initializeSchema(): Promise<void> {
     ]
     
     let schema: string | null = null
-    let schemaPath: string | null = null
     
     for (const path of possiblePaths) {
       try {
         console.log('Trying schema path:', path)
         schema = readFileSync(path, 'utf-8')
-        schemaPath = path
         console.log('Successfully loaded schema from:', path)
         break
-      } catch (err) {
+      } catch {
         console.log('Path not found:', path)
       }
     }
@@ -104,20 +111,20 @@ export async function initializeSchema(): Promise<void> {
           FROM information_schema.tables 
           WHERE table_schema = 'public'
         `)
-        console.log('Existing tables:', existingTables.rows.map((r: any) => r.table_name))
+        console.log('Existing tables:', existingTables.rows.map((r: TableRow) => r.table_name))
         
         // Check if users table exists and what columns it has
-        if (existingTables.rows.some((r: any) => r.table_name === 'users')) {
+        if (existingTables.rows.some((r: TableRow) => r.table_name === 'users')) {
           const userColumns = await client.query(`
             SELECT column_name 
             FROM information_schema.columns 
             WHERE table_name = 'users' AND table_schema = 'public'
           `)
-          console.log('Users table columns:', userColumns.rows.map((r: any) => r.column_name))
+          console.log('Users table columns:', userColumns.rows.map((r: ColumnRow) => r.column_name))
           
           // Check if the users table has the correct schema
-          const hasUserId = userColumns.rows.some((r: any) => r.column_name === 'user_id')
-          const hasRole = userColumns.rows.some((r: any) => r.column_name === 'role')
+          const hasUserId = userColumns.rows.some((r: ColumnRow) => r.column_name === 'user_id')
+          const hasRole = userColumns.rows.some((r: ColumnRow) => r.column_name === 'role')
           
           if (!hasUserId || !hasRole) {
             console.log('Users table has incorrect schema, need to migrate...')
@@ -131,7 +138,7 @@ export async function initializeSchema(): Promise<void> {
         }
         
         // Check space_themes table exists
-        const hasSpaceThemes = existingTables.rows.some((r: any) => r.table_name === 'space_themes')
+        const hasSpaceThemes = existingTables.rows.some((r: TableRow) => r.table_name === 'space_themes')
         if (!hasSpaceThemes) {
           console.log('space_themes table missing, will be created')
         }
