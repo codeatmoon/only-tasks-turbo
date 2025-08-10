@@ -6,31 +6,34 @@ import KanbanBoard from "@/components/tasks/KanbanBoard";
 import TaskGraph from "@/components/tasks/TaskGraph";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { LucideSettings, LucideLoader } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 import ViewSelector from "@/components/ViewSelector";
 import { useAuth } from "@/lib/auth-context";
 import { createAuthenticatedFetch } from "@/lib/auth-utils";
-import LoginForm from "@/components/auth/LoginForm";
+import { projects as mockProjects } from "@/data/mockData";
 
-export default function SpacePage() {
+interface TasksPageProps {
+  spaceid?: string;
+}
+
+export default function TasksPage({ spaceid }: TasksPageProps) {
   const router = useRouter();
-  const params = useParams();
-  const spaceid = params.spaceid as string;
   const { user, loading: authLoading } = useAuth();
   const authenticatedFetch = createAuthenticatedFetch();
 
-  const [spaceExists, setSpaceExists] = useState<boolean | null>(null);
-  const [userOwnsSpace, setUserOwnsSpace] = useState<boolean | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
+  
+  // Use different storage keys based on whether this is a user session or demo
+  const storagePrefix = spaceid ? spaceid : (user ? "user" : "demo");
   const [lastSel] = useLocalStorage<{ projectId?: string; appId?: string }>(
-    `${spaceid}-lastSel`,
+    `${storagePrefix}-lastSel`,
     {},
   );
   const [view, setView] = useLocalStorage<"sheet" | "kanban" | "graph">(
-    `${spaceid}-viewMode`,
+    `${storagePrefix}-viewMode`,
     "sheet",
   );
   type ThemeState = {
@@ -71,37 +74,15 @@ export default function SpacePage() {
     [],
   );
 
-  // Check for magic link token on load
-  useEffect(() => {
-    const checkToken = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("token");
+  // Load projects based on auth state
+  const loadProjects = useCallback(async () => {
+    if (!authLoading && !user) {
+      // For unauthenticated users, use mock data
+      setProjects(mockProjects);
+      setLoading(false);
+      return;
+    }
 
-      if (token) {
-        try {
-          const response = await fetch("/api/auth/login-token", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
-          });
-
-          if (response.ok) {
-            // User authenticated, remove token from URL
-            window.history.replaceState({}, "", `/${spaceid}`);
-          }
-        } catch (error) {
-          console.error("Token authentication failed:", error);
-        }
-      }
-    };
-
-    checkToken();
-  }, [spaceid]);
-
-  // Check space access and ownership
-  const checkSpaceAccess = useCallback(async () => {
     if (!user) {
       setLoading(false);
       return;
@@ -110,62 +91,42 @@ export default function SpacePage() {
     setLoading(true);
     setApiError(null);
     try {
-      // Check if space exists and if user owns it
-      const spaceResponse = await authenticatedFetch(`/api/spaces?id=${spaceid}`);
-
-      if (spaceResponse.ok) {
-        setSpaceExists(true);
-
-        // Check if the authenticated user owns the space
-        // We'll compare the Firebase UID with the space owner
-        const ownershipResponse = await authenticatedFetch(`/api/spaces/${spaceid}/ownership`);
-        if (ownershipResponse.ok) {
-          const { owns } = await ownershipResponse.json();
-          setUserOwnsSpace(owns);
-
-          if (owns) {
-            // Load projects if user owns the space
-            const projectsResponse = await authenticatedFetch(`/api/spaces/${spaceid}/projects`);
-            if (projectsResponse.ok) {
-              const { projects } = await projectsResponse.json();
-              setProjects(projects);
-            } else {
-              console.error("Failed to load projects");
-              setProjects([]);
-            }
-          }
-        } else {
-          setUserOwnsSpace(false);
-        }
-      } else if (spaceResponse.status === 404) {
-        // Space doesn't exist
-        setSpaceExists(false);
-        setUserOwnsSpace(false);
+      // For authenticated users, try to load from API
+      // If spaceid is provided, use space-specific API, otherwise use user's default projects
+      const endpoint = spaceid 
+        ? `/api/spaces/${spaceid}/projects`
+        : `/api/user/projects`;
+      
+      const projectsResponse = await authenticatedFetch(endpoint);
+      if (projectsResponse.ok) {
+        const { projects } = await projectsResponse.json();
+        setProjects(projects);
       } else {
-        console.error("Error checking space");
-        setApiError("Failed to check space");
+        console.error("Failed to load projects, falling back to mock data");
+        setProjects(mockProjects);
       }
     } catch (error) {
-      console.error("Error checking space access:", error);
-      setApiError("Network error while checking space access");
+      console.error("Error loading projects:", error);
+      setProjects(mockProjects);
     } finally {
       setLoading(false);
     }
-  }, [spaceid, user, authenticatedFetch]);
+  }, [user, authLoading, authenticatedFetch, spaceid]);
 
   useEffect(() => {
-    if (!authLoading) {
-      checkSpaceAccess();
-    }
-  }, [checkSpaceAccess, authLoading]);
+    loadProjects();
+  }, [loadProjects]);
 
   // Load and apply theme
   useEffect(() => {
     const loadTheme = async () => {
-      if (!user || !userOwnsSpace) return;
+      if (!user) return;
 
       try {
-        const res = await authenticatedFetch(`/api/spaces/${spaceid}/theme`);
+        const endpoint = spaceid 
+          ? `/api/spaces/${spaceid}/theme`
+          : `/api/user/theme`;
+        const res = await authenticatedFetch(endpoint);
         if (res.ok) {
           const { theme } = await res.json();
           const defaultTheme: ThemeState = {
@@ -197,7 +158,7 @@ export default function SpacePage() {
     };
     loadTheme();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spaceid, user, userOwnsSpace]);
+  }, [user]);
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === lastSel.projectId) ?? projects[0];
@@ -225,26 +186,44 @@ export default function SpacePage() {
       );
       setProjects(newProjects);
 
-      // Sync with database
-      try {
-        // Reload data to ensure consistency
-        await checkSpaceAccess();
-      } catch (error) {
-        console.error("Failed to sync with database:", error);
-        // Revert local changes on error
-        checkSpaceAccess();
+      // Sync with database only if user is authenticated
+      if (user) {
+        try {
+          // Reload data to ensure consistency
+          await loadProjects();
+        } catch (error) {
+          console.error("Failed to sync with database:", error);
+          // Revert local changes on error
+          loadProjects();
+        }
       }
     },
-    [projects, currentProject, currentApp, setProjects, checkSpaceAccess],
+    [projects, currentProject, currentApp, setProjects, loadProjects, user],
   );
 
   const onCreateTask = useCallback(
     async (sprintId: string, draft: TaskDraft) => {
       if (!currentApp || !currentProject) return;
 
+      // For unauthenticated users, just use local storage
+      if (!user) {
+        const id = `t-${Date.now()}`;
+        const task: Task = { id, ...draft };
+        updateCurrentApp((app) => ({
+          ...app,
+          sprints: app.sprints.map((s) =>
+            s.id === sprintId ? { ...s, tasks: [...s.tasks, task] } : s,
+          ),
+        }));
+        return;
+      }
+
       try {
-        // Create task in database first
-        const response = await authenticatedFetch(`/api/spaces/${spaceid}/tasks`, {
+        // Create task in database for authenticated users
+        const endpoint = spaceid 
+          ? `/api/spaces/${spaceid}/tasks`
+          : `/api/user/tasks`;
+        const response = await authenticatedFetch(endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -273,7 +252,7 @@ export default function SpacePage() {
         alert("Failed to create task. Please try again.");
       }
     },
-    [updateCurrentApp, currentApp, currentProject, spaceid, authenticatedFetch],
+    [updateCurrentApp, currentApp, currentProject, spaceid, authenticatedFetch, user],
   );
 
   const onEditTask = async (
@@ -281,9 +260,30 @@ export default function SpacePage() {
     taskId: string,
     partial: Partial<Task>,
   ) => {
+    // For unauthenticated users, just use local storage
+    if (!user) {
+      updateCurrentApp((app) => ({
+        ...app,
+        sprints: app.sprints.map((s) =>
+          s.id === sprintId
+            ? {
+              ...s,
+              tasks: s.tasks.map((t) =>
+                t.id === taskId ? { ...t, ...partial } : t,
+              ),
+            }
+            : s,
+        ),
+      }));
+      return;
+    }
+
     try {
-      // Update task in database first
-      const response = await authenticatedFetch(`/api/spaces/${spaceid}/tasks/${taskId}`, {
+      // Update task in database for authenticated users
+      const endpoint = spaceid 
+        ? `/api/spaces/${spaceid}/tasks/${taskId}`
+        : `/api/user/tasks/${taskId}`;
+      const response = await authenticatedFetch(endpoint, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -315,7 +315,7 @@ export default function SpacePage() {
     }
   };
 
-  // Show loading state while checking auth
+  // Show loading state while checking auth or loading projects
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
@@ -324,22 +324,9 @@ export default function SpacePage() {
             size={48}
             className="animate-spin text-blue-600 mx-auto mb-4"
           />
-          <p className="text-gray-600 dark:text-gray-400">Loading space...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading tasks...</p>
         </div>
       </div>
-    );
-  }
-
-  // Show login form if not authenticated or doesn't own space (but not for API/network errors)
-  if (!user || (userOwnsSpace === false && !apiError)) {
-    return (
-      <LoginForm
-        spaceId={spaceid}
-        onSuccess={() => {
-          // Refresh the page after successful login
-          window.location.reload();
-        }}
-      />
     );
   }
 
@@ -355,33 +342,11 @@ export default function SpacePage() {
           <button
             onClick={() => {
               setApiError(null);
-              checkSpaceAccess();
+              loadProjects();
             }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Show message if space doesn't exist
-  if (spaceExists === false) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Space Not Found
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            The space &quot;{spaceid}&quot; does not exist.
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Go Home
           </button>
         </div>
       </div>
@@ -394,7 +359,7 @@ export default function SpacePage() {
         <div>
           <header className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-semibold dark:text-gray-100">
-              Tasks - {spaceid}
+              Tasks {spaceid ? `- ${spaceid}` : ''}
             </h1>
             <div className="flex items-center gap-3">
               <button
