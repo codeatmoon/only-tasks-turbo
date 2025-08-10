@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system CSS variables and theme classes - temporarily commented out */
-/* @import '@scss-theming/design-system-2/dist/index.css'; */
+/* Design system CSS variables and theme classes */
+@import '@scss-theming/design-system-2/dist/index.css';
 
 /* Enhanced theme variables for create space page */
 :root {
