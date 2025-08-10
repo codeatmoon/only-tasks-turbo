@@ -461,12 +461,12 @@ export default function CreateSpacePage() {
             </FormPanel>
 
             {/* Divider */}
-            <div
+            {/* <div
               className="hidden lg:block w-px"
               style={{ backgroundColor: "var(--createspace-border)" }}
               role="separator"
               aria-hidden="true"
-            />
+            /> */}
 
             {/* Right Panel: Existing Account */}
             <FormPanel
