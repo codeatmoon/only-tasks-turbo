@@ -11,8 +11,13 @@ export async function POST(request: NextRequest) {
     try {
       await initializeSchema()
     } catch (schemaError) {
-      console.warn('Schema initialization warning:', schemaError)
-      // Continue even if schema initialization fails (might already exist)
+      console.error('Schema initialization error:', schemaError)
+      // For development, fail fast on schema errors
+      // In production, this might be more lenient
+      if (process.env.NODE_ENV !== 'production') {
+        throw schemaError
+      }
+      console.warn('Schema initialization failed, attempting to continue...')
     }
 
     const body = await request.json()
