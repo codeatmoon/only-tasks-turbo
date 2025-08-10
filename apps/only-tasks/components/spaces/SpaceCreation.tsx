@@ -1,102 +1,107 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { LucideLoader, LucidePlus } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { LucideLoader, LucidePlus } from "lucide-react";
 
 interface SpaceCreationProps {
-  spaceId: string
-  onSpaceCreated: () => void
-  onCancel: () => void
-  isPage?: boolean
+  spaceId: string;
+  onSpaceCreated: () => void;
+  onCancel: () => void;
+  isPage?: boolean;
 }
 
-export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPage = false }: SpaceCreationProps) {
-  const [name, setName] = useState(spaceId || '')
-  const [description, setDescription] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [ownerName, setOwnerName] = useState('')
-  const [pin, setPin] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [mode, setMode] = useState<'claim' | 'login'>('claim')
-  const [step, setStep] = useState<'form' | 'verify'>('form')
-  const [verificationId, setVerificationId] = useState('')
+export default function SpaceCreation({
+  spaceId,
+  onSpaceCreated,
+  onCancel,
+  isPage = false,
+}: SpaceCreationProps) {
+  const [name, setName] = useState(spaceId || "");
+  const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const [pin, setPin] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [mode, setMode] = useState<"claim" | "login">("claim");
+  const [step, setStep] = useState<"form" | "verify">("form");
+  const [verificationId, setVerificationId] = useState("");
 
   // Update name when spaceId changes (for prefilling from URL)
   useEffect(() => {
     if (spaceId && !name) {
-      setName(spaceId)
+      setName(spaceId);
     }
-  }, [spaceId, name])
+  }, [spaceId, name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!name.trim()) {
-      setError('Space name is required')
-      return
+      setError("Space name is required");
+      return;
     }
 
     if (!email.trim()) {
-      setError('Email is required')
-      return
+      setError("Email is required");
+      return;
     }
 
-    if (mode === 'claim' && !password) {
-      setError('Password is required to claim a space')
-      return
+    if (mode === "claim" && !password) {
+      setError("Password is required to claim a space");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/spaces', {
-        method: 'POST',
+      const response = await fetch("/api/spaces", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id: spaceId || name.trim(),
           name: name.trim(),
           description: description.trim() || undefined,
           email: email.trim(),
-          password: mode === 'claim' ? password : undefined,
+          password: mode === "claim" ? password : undefined,
           ownerName: ownerName.trim() || undefined,
-          verificationId: verificationId || undefined
-        })
-      })
+          verificationId: verificationId || undefined,
+        }),
+      });
 
-      const responseData = await response.json()
+      const responseData = await response.json();
 
       if (!response.ok) {
         if (responseData.requiresVerification) {
           // User doesn't exist, send verification email
-          await handleSendVerificationPin()
-          return
+          await handleSendVerificationPin();
+          return;
         } else {
-          throw new Error(responseData.error || 'Failed to create space')
+          throw new Error(responseData.error || "Failed to create space");
         }
       }
 
-      onSpaceCreated()
+      onSpaceCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create space')
+      setError(err instanceof Error ? err.message : "Failed to create space");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSendVerificationPin = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email.trim(),
@@ -104,106 +109,112 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
             id: spaceId || name.trim(),
             name: name.trim(),
             description: description.trim() || undefined,
-            ownerName: ownerName.trim() || undefined
-          }
-        })
-      })
+            ownerName: ownerName.trim() || undefined,
+          },
+        }),
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to send verification email')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send verification email");
       }
 
-      setStep('verify')
+      setStep("verify");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification email')
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification email",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyPin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!pin.trim()) {
-      setError('PIN is required')
-      return
+      setError("PIN is required");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email.trim(),
-          pin: pin.trim()
-        })
-      })
+          pin: pin.trim(),
+        }),
+      });
 
-      const responseData = await response.json()
+      const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to verify PIN')
+        throw new Error(responseData.error || "Failed to verify PIN");
       }
 
       // PIN verified, now create the space
-      setVerificationId(responseData.spaceData?.id || 'verified')
-      setStep('form')
-      
+      setVerificationId(responseData.spaceData?.id || "verified");
+      setStep("form");
+
       // Automatically submit the form with verification
       setTimeout(() => {
-        handleSubmit(e)
-      }, 100)
+        handleSubmit(e);
+      }, 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to verify PIN')
+      setError(err instanceof Error ? err.message : "Failed to verify PIN");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleBackToForm = () => {
-    setStep('form')
-    setPin('')
-    setError('')
-  }
+    setStep("form");
+    setPin("");
+    setError("");
+  };
 
   const handleSendLoginLink = async () => {
     if (!email.trim()) {
-      setError('Email is required')
-      return
+      setError("Email is required");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/login-token', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login-token", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email.trim(),
-          spaceId
-        })
-      })
+          spaceId,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to send login link')
+        throw new Error("Failed to send login link");
       }
 
-      setError('')
-      alert('Login link sent to your email!')
+      setError("");
+      alert("Login link sent to your email!");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send login link')
+      setError(
+        err instanceof Error ? err.message : "Failed to send login link",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -211,47 +222,59 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-3xl mx-auto mb-6 flex items-center justify-center">
-            <LucidePlus size={40} className="text-blue-600 dark:text-blue-400" />
+            <LucidePlus
+              size={40}
+              className="text-blue-600 dark:text-blue-400"
+            />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            {step === 'verify' 
-              ? 'Verify Your Email' 
-              : (isPage ? 'Create Your Space' : 'Create New Space')
-            }
+            {step === "verify"
+              ? "Verify Your Email"
+              : isPage
+                ? "Create Your Space"
+                : "Create New Space"}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {step === 'verify'
+            {step === "verify"
               ? `We've sent a 6-digit PIN to ${email}. Please enter it below to verify your email address.`
-              : (isPage 
-                ? (spaceId ? `Set up your space "${spaceId}" and start organizing your tasks` : 'Set up your personalized workspace and start organizing your tasks')
-                : `Space "${spaceId}" doesn't exist yet. Let's create it and get you started!`
-              )
-            }
+              : isPage
+                ? spaceId
+                  ? `Set up your space "${spaceId}" and start organizing your tasks`
+                  : "Set up your personalized workspace and start organizing your tasks"
+                : `Space "${spaceId}" doesn't exist yet. Let's create it and get you started!`}
           </p>
         </div>
 
         {/* Main Form Container */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-lg overflow-hidden">
-          {step === 'verify' ? (
+          {step === "verify" ? (
             /* PIN Verification Form */
             <form onSubmit={handleVerifyPin} className="p-8">
               <div className="max-w-md mx-auto">
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Email Verification</h3>
+                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                    Email Verification
+                  </h3>
                   <p className="text-blue-700 dark:text-blue-300 text-sm">
-                    Enter the 6-digit PIN we sent to your email address to continue.
+                    Enter the 6-digit PIN we sent to your email address to
+                    continue.
                   </p>
                 </div>
 
                 <div className="mb-6">
-                  <label htmlFor="pin" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="pin"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Verification PIN
                   </label>
                   <input
                     type="text"
                     id="pin"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setPin(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
                                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
@@ -268,7 +291,9 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
 
                 {error && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                      {error}
+                    </p>
                   </div>
                 )}
 
@@ -298,7 +323,7 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                         Verifying...
                       </>
                     ) : (
-                      'Verify & Continue'
+                      "Verify & Continue"
                     )}
                   </button>
                 </div>
@@ -320,34 +345,40 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
             <>
               {/* Mode Selection Section */}
               <div className="bg-gray-50 dark:bg-gray-800 px-8 py-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Choose Your Approach</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Choose Your Approach
+                </h2>
                 <div className="flex gap-4">
                   <button
                     type="button"
-                    onClick={() => setMode('claim')}
+                    onClick={() => setMode("claim")}
                     className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
-                      mode === 'claim' 
-                        ? 'bg-blue-600 text-white shadow-md' 
-                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      mode === "claim"
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
                   >
                     <div className="text-center">
                       <div className="font-semibold">Claim Space</div>
-                      <div className="text-xs opacity-80 mt-1">Create a new account and claim ownership</div>
+                      <div className="text-xs opacity-80 mt-1">
+                        Create a new account and claim ownership
+                      </div>
                     </div>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setMode('login')}
+                    onClick={() => setMode("login")}
                     className={`flex-1 px-6 py-4 rounded-xl text-sm font-medium transition-all ${
-                      mode === 'login' 
-                        ? 'bg-blue-600 text-white shadow-md' 
-                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      mode === "login"
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
                   >
                     <div className="text-center">
                       <div className="font-semibold">Already Have Account</div>
-                      <div className="text-xs opacity-80 mt-1">Send me a secure login link</div>
+                      <div className="text-xs opacity-80 mt-1">
+                        Send me a secure login link
+                      </div>
                     </div>
                   </button>
                 </div>
@@ -357,10 +388,15 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
               <form onSubmit={handleSubmit} className="p-8">
                 {/* Account Information Section */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Account Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+                    Account Information
+                  </h3>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
                         Email Address *
                       </label>
                       <input
@@ -378,9 +414,12 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                       />
                     </div>
 
-                    {mode === 'claim' && (
+                    {mode === "claim" && (
                       <div>
-                        <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label
+                          htmlFor="ownerName"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                        >
                           Your Name (optional)
                         </label>
                         <input
@@ -399,14 +438,17 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                     )}
                   </div>
 
-                  {mode === 'claim' && (
+                  {mode === "claim" && (
                     <div className="mt-6">
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label
+                        htmlFor="password"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
                         Password *
                       </label>
                       <div className="relative max-w-md">
                         <input
-                          type={showPassword ? 'text' : 'password'}
+                          type={showPassword ? "text" : "password"}
                           id="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -422,19 +464,24 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                         >
-                          {showPassword ? '🙈' : '👁️'}
+                          {showPassword ? "🙈" : "👁️"}
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {mode === 'claim' && (
+                {mode === "claim" && (
                   <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Space Configuration</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+                      Space Configuration
+                    </h3>
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                        >
                           Space Name *
                         </label>
                         <input
@@ -451,7 +498,10 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                         />
                       </div>
                       <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                        >
                           Description (optional)
                         </label>
                         <textarea
@@ -471,13 +521,16 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                   </div>
                 )}
 
-                {mode === 'login' && (
+                {mode === "login" && (
                   <div className="text-center py-8">
                     <div className="max-w-md mx-auto">
                       <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-6">
-                        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Secure Login</h3>
+                        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                          Secure Login
+                        </h3>
                         <p className="text-blue-700 dark:text-blue-300 text-sm">
-                          We&apos;ll send you a secure login link to access the space. No password required!
+                          We&apos;ll send you a secure login link to access the
+                          space. No password required!
                         </p>
                       </div>
                       <button
@@ -495,7 +548,7 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                             Sending...
                           </>
                         ) : (
-                          'Send Login Link'
+                          "Send Login Link"
                         )}
                       </button>
                     </div>
@@ -504,7 +557,9 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
 
                 {error && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                      {error}
+                    </p>
                   </div>
                 )}
 
@@ -521,10 +576,12 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                   >
                     Cancel
                   </button>
-                  {mode === 'claim' && (
+                  {mode === "claim" && (
                     <button
                       type="submit"
-                      disabled={loading || !name.trim() || !email.trim() || !password}
+                      disabled={
+                        loading || !name.trim() || !email.trim() || !password
+                      }
                       className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl
                                  hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
                                  transition-colors duration-200 flex items-center justify-center gap-2
@@ -536,18 +593,18 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
                           Creating...
                         </>
                       ) : (
-                        'Claim Space'
+                        "Claim Space"
                       )}
                     </button>
                   )}
 
-                  {mode === 'login' && (
+                  {mode === "login" && (
                     <div className="text-center">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Don&apos;t have an account? 
+                        Don&apos;t have an account?
                         <button
                           type="button"
-                          onClick={() => setMode('claim')}
+                          onClick={() => setMode("claim")}
                           className="text-blue-600 dark:text-blue-400 hover:underline ml-1 font-medium"
                         >
                           Claim this space
@@ -562,5 +619,5 @@ export default function SpaceCreation({ spaceId, onSpaceCreated, onCancel, isPag
         </div>
       </div>
     </div>
-  )
+  );
 }

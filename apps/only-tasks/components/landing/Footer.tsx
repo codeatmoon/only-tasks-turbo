@@ -1,55 +1,61 @@
-'use client'
-import { LucideGrid3X3, LucideGithub, LucideTwitter, LucideLinkedin, LucideMail } from 'lucide-react'
+"use client";
+import {
+  LucideGrid3X3,
+  LucideGithub,
+  LucideTwitter,
+  LucideLinkedin,
+  LucideMail,
+} from "lucide-react";
 
 const navigation = {
   product: [
-    { name: 'Features', href: '#features' },
-    { name: 'Demo', href: '/demo' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Changelog', href: '#changelog' },
+    { name: "Features", href: "#features" },
+    { name: "Demo", href: "/demo" },
+    { name: "Pricing", href: "#pricing" },
+    { name: "Changelog", href: "#changelog" },
   ],
   company: [
-    { name: 'About', href: '#about' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Careers', href: '#careers' },
-    { name: 'Contact', href: '#contact' },
+    { name: "About", href: "#about" },
+    { name: "Blog", href: "#blog" },
+    { name: "Careers", href: "#careers" },
+    { name: "Contact", href: "#contact" },
   ],
   resources: [
-    { name: 'Documentation', href: '#docs' },
-    { name: 'Help Center', href: '#help' },
-    { name: 'API Reference', href: '#api' },
-    { name: 'Community', href: '#community' },
+    { name: "Documentation", href: "#docs" },
+    { name: "Help Center", href: "#help" },
+    { name: "API Reference", href: "#api" },
+    { name: "Community", href: "#community" },
   ],
   legal: [
-    { name: 'Privacy Policy', href: '#privacy' },
-    { name: 'Terms of Service', href: '#terms' },
-    { name: 'Cookie Policy', href: '#cookies' },
-    { name: 'GDPR', href: '#gdpr' },
+    { name: "Privacy Policy", href: "#privacy" },
+    { name: "Terms of Service", href: "#terms" },
+    { name: "Cookie Policy", href: "#cookies" },
+    { name: "GDPR", href: "#gdpr" },
   ],
-}
+};
 
 const socialLinks = [
   {
-    name: 'GitHub',
-    href: '#',
+    name: "GitHub",
+    href: "#",
     icon: LucideGithub,
   },
   {
-    name: 'Twitter',
-    href: '#',
+    name: "Twitter",
+    href: "#",
     icon: LucideTwitter,
   },
   {
-    name: 'LinkedIn',
-    href: '#',
+    name: "LinkedIn",
+    href: "#",
     icon: LucideLinkedin,
   },
   {
-    name: 'Email',
-    href: 'mailto:hello@onlytasks.com',
+    name: "Email",
+    href: "mailto:hello@onlytasks.com",
     icon: LucideMail,
   },
-]
+];
 
 export default function Footer() {
   return (
@@ -57,7 +63,7 @@ export default function Footer() {
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
-      
+
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-20 sm:pt-24 lg:px-8 lg:pt-32">
         {/* Main Footer Content */}
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
@@ -71,17 +77,17 @@ export default function Footer() {
                 </div>
                 <span className="text-2xl font-bold text-white">OnlyTasks</span>
               </div>
-              
+
               {/* Description */}
               <p className="mt-4 text-sm leading-6 text-slate-300">
-                Beautiful sprint-based task management for modern teams. 
+                Beautiful sprint-based task management for modern teams.
                 Organize, collaborate, and ship faster with OnlyTasks.
               </p>
-              
+
               {/* Social Links */}
               <div className="mt-6 flex gap-4">
                 {socialLinks.map((item) => {
-                  const Icon = item.icon
+                  const Icon = item.icon;
                   return (
                     <a
                       key={item.name}
@@ -91,21 +97,26 @@ export default function Footer() {
                       <span className="sr-only">{item.name}</span>
                       <Icon className="h-5 w-5" />
                     </a>
-                  )
+                  );
                 })}
               </div>
             </div>
           </div>
-          
+
           {/* Navigation Links */}
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">Product</h3>
+                <h3 className="text-sm font-semibold leading-6 text-white">
+                  Product
+                </h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.product.map((item) => (
                     <li key={item.name}>
-                      <a href={item.href} className="text-sm leading-6 text-slate-300 hover:text-white transition-colors">
+                      <a
+                        href={item.href}
+                        className="text-sm leading-6 text-slate-300 hover:text-white transition-colors"
+                      >
                         {item.name}
                       </a>
                     </li>
@@ -113,11 +124,16 @@ export default function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6 text-white">Company</h3>
+                <h3 className="text-sm font-semibold leading-6 text-white">
+                  Company
+                </h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.company.map((item) => (
                     <li key={item.name}>
-                      <a href={item.href} className="text-sm leading-6 text-slate-300 hover:text-white transition-colors">
+                      <a
+                        href={item.href}
+                        className="text-sm leading-6 text-slate-300 hover:text-white transition-colors"
+                      >
                         {item.name}
                       </a>
                     </li>
@@ -127,11 +143,16 @@ export default function Footer() {
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">Resources</h3>
+                <h3 className="text-sm font-semibold leading-6 text-white">
+                  Resources
+                </h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.resources.map((item) => (
                     <li key={item.name}>
-                      <a href={item.href} className="text-sm leading-6 text-slate-300 hover:text-white transition-colors">
+                      <a
+                        href={item.href}
+                        className="text-sm leading-6 text-slate-300 hover:text-white transition-colors"
+                      >
                         {item.name}
                       </a>
                     </li>
@@ -139,11 +160,16 @@ export default function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6 text-white">Legal</h3>
+                <h3 className="text-sm font-semibold leading-6 text-white">
+                  Legal
+                </h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.legal.map((item) => (
                     <li key={item.name}>
-                      <a href={item.href} className="text-sm leading-6 text-slate-300 hover:text-white transition-colors">
+                      <a
+                        href={item.href}
+                        className="text-sm leading-6 text-slate-300 hover:text-white transition-colors"
+                      >
                         {item.name}
                       </a>
                     </li>
@@ -153,7 +179,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        
+
         {/* Newsletter Signup */}
         <div className="mt-16 border-t border-slate-800 pt-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -180,7 +206,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        
+
         {/* Bottom Section */}
         <div className="mt-8 border-t border-slate-800 pt-8 md:flex md:items-center md:justify-between">
           <div className="flex space-x-6 md:order-2">
@@ -194,5 +220,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

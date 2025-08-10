@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 interface ButtonProps {
-  children: ReactNode
-  variant?: 'blue' | 'slate' | 'rose' | 'amber' | 'green'
-  type?: 'button' | 'submit' | 'reset'
-  disabled?: boolean
-  onClick?: () => void
-  className?: string
-  size?: 'sm' | 'md' | 'lg'
+  children: ReactNode;
+  variant?: "blue" | "slate" | "rose" | "amber" | "green";
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  onClick?: () => void;
+  className?: string;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function Button({
   children,
-  variant = 'slate',
-  type = 'button',
+  variant = "slate",
+  type = "button",
   disabled = false,
   onClick,
-  className = '',
-  size = 'md'
+  className = "",
+  size = "md",
 }: ButtonProps) {
   const baseClasses = `
     inline-flex items-center justify-center gap-2 
@@ -27,13 +27,13 @@ export default function Button({
     transition-all duration-200 
     focus:outline-none focus:ring-2 focus:ring-offset-2
     disabled:opacity-50 disabled:cursor-not-allowed
-  `
+  `;
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
-  }
+    sm: "px-3 py-1.5 text-xs",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
 
   const variantClasses = {
     blue: `
@@ -70,15 +70,17 @@ export default function Button({
       border-green-200 dark:border-green-800
       hover:bg-green-100 dark:hover:bg-green-900/30
       focus:ring-green-500
-    `
-  }
+    `,
+  };
 
   const combinedClasses = `
     ${baseClasses} 
     ${sizeClasses[size]} 
     ${variantClasses[variant]} 
     ${className}
-  `.replace(/\s+/g, ' ').trim()
+  `
+    .replace(/\s+/g, " ")
+    .trim();
 
   return (
     <button
@@ -89,5 +91,5 @@ export default function Button({
     >
       {children}
     </button>
-  )
+  );
 }

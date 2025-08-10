@@ -1,22 +1,26 @@
-import nodemailer from 'nodemailer'
+import nodemailer from "nodemailer";
 
 const SMTP_CONFIG = {
-  host: 'email-smtp.us-east-1.amazonaws.com',
+  host: "email-smtp.us-east-1.amazonaws.com",
   port: 587,
   secure: false,
   auth: {
-    user: 'AKIAQQIGIQ3E6V2TZIIR',
-    pass: 'BNz3/VmUR/ToEwTTlTyGIxxXw1BPuk2+cX5UuxR6pBg+'
-  }
-}
+    user: "AKIAQQIGIQ3E6V2TZIIR",
+    pass: "BNz3/VmUR/ToEwTTlTyGIxxXw1BPuk2+cX5UuxR6pBg+",
+  },
+};
 
-const transporter = nodemailer.createTransport(SMTP_CONFIG)
+const transporter = nodemailer.createTransport(SMTP_CONFIG);
 
-export async function sendPasswordResetEmail(email: string, token: string, spaceId: string) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${spaceId}?token=${token}`
-  
+export async function sendPasswordResetEmail(
+  email: string,
+  token: string,
+  spaceId: string,
+) {
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/${spaceId}?token=${token}`;
+
   const mailOptions = {
-    from: 'noreply@only-tasks.com',
+    from: "noreply@only-tasks.com",
     to: email,
     subject: `Password Reset for Space "${spaceId}"`,
     html: `
@@ -28,17 +32,21 @@ export async function sendPasswordResetEmail(email: string, token: string, space
         <p>This link will expire in 24 hours.</p>
         <p>If you didn't request this reset, you can ignore this email.</p>
       </div>
-    `
-  }
+    `,
+  };
 
-  await transporter.sendMail(mailOptions)
+  await transporter.sendMail(mailOptions);
 }
 
-export async function sendLoginTokenEmail(email: string, token: string, spaceId: string) {
-  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${spaceId}?token=${token}`
-  
+export async function sendLoginTokenEmail(
+  email: string,
+  token: string,
+  spaceId: string,
+) {
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/${spaceId}?token=${token}`;
+
   const mailOptions = {
-    from: 'noreply@only-tasks.com',
+    from: "noreply@only-tasks.com",
     to: email,
     subject: `Login Link for Space "${spaceId}"`,
     html: `
@@ -49,15 +57,19 @@ export async function sendLoginTokenEmail(email: string, token: string, spaceId:
         <p>This link will expire in 24 hours.</p>
         <p>If you didn't request this login link, you can ignore this email.</p>
       </div>
-    `
-  }
+    `,
+  };
 
-  await transporter.sendMail(mailOptions)
+  await transporter.sendMail(mailOptions);
 }
 
-export async function sendEmailVerificationPin(email: string, pin: string, spaceId: string) {
+export async function sendEmailVerificationPin(
+  email: string,
+  pin: string,
+  spaceId: string,
+) {
   const mailOptions = {
-    from: 'noreply@only-tasks.com',
+    from: "noreply@only-tasks.com",
     to: email,
     subject: `Email Verification for Space "${spaceId}"`,
     html: `
@@ -70,8 +82,8 @@ export async function sendEmailVerificationPin(email: string, pin: string, space
         <p>This PIN will expire in 15 minutes.</p>
         <p>If you didn't request this verification, you can ignore this email.</p>
       </div>
-    `
-  }
+    `,
+  };
 
-  await transporter.sendMail(mailOptions)
+  await transporter.sendMail(mailOptions);
 }
