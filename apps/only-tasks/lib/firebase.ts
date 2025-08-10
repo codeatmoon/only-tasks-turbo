@@ -9,8 +9,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase client-side app only if we have a valid project ID
-let app: any = null;
-let auth: any = null;
+let app: ReturnType<typeof initializeApp> | null = null;
+let auth: ReturnType<typeof getAuth> | null = null;
 let googleProvider: GoogleAuthProvider | null = null;
 
 try {

@@ -20,7 +20,6 @@ export default function LoginForm({ spaceId, onSuccess }: LoginFormProps) {
   // Form states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignIn, setIsSignIn] = useState(true);
   const [showResetPassword, setShowResetPassword] = useState(false);
   
   // UI states
@@ -45,8 +44,8 @@ export default function LoginForm({ spaceId, onSuccess }: LoginFormProps) {
         await resetPassword(email);
         setSuccessMessage("Password reset email sent! Check your inbox.");
         setShowResetPassword(false);
-      } catch (err: any) {
-        setError(err.message || "Failed to send password reset email");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to send password reset email");
       } finally {
         setLoading(false);
       }
@@ -64,8 +63,8 @@ export default function LoginForm({ spaceId, onSuccess }: LoginFormProps) {
     try {
       await signInWithEmail(email, password);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to sign in");
     } finally {
       setLoading(false);
     }
@@ -78,8 +77,8 @@ export default function LoginForm({ spaceId, onSuccess }: LoginFormProps) {
     try {
       await signInWithGoogle();
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in with Google");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to sign in with Google");
     } finally {
       setLoading(false);
     }

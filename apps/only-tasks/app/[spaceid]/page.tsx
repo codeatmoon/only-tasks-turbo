@@ -112,7 +112,6 @@ export default function SpacePage() {
       const spaceResponse = await authenticatedFetch(`/api/spaces?id=${spaceid}`);
 
       if (spaceResponse.ok) {
-        const { space } = await spaceResponse.json();
         setSpaceExists(true);
         
         // Check if the authenticated user owns the space
@@ -353,7 +352,7 @@ export default function SpacePage() {
             Space Not Found
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            The space "{spaceid}" does not exist.
+            The space &quot;{spaceid}&quot; does not exist.
           </p>
           <button
             onClick={() => router.push("/")}

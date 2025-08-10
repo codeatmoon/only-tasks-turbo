@@ -7,6 +7,8 @@ export async function getFirebaseToken(): Promise<string | null> {
   
   try {
     const { auth } = await import("./firebase");
+    if (!auth) return null;
+    
     const user = auth.currentUser;
     if (!user) return null;
     
