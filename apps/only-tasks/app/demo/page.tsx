@@ -100,9 +100,9 @@ export default function DemoPage() {
             </h1>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push("/settings")}
+                onClick={() => router.push("/dashboard")}
                 className="icon-btn"
-                title="Settings"
+                title="Dashboard"
               >
                 <LucideSettings size={16} />
               </button>
