@@ -1,255 +1,262 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import ThemeToggle from '@/components/ThemeToggle'
-import FormPanel from '@/components/ui/FormPanel'
-import InputField from '@/components/ui/InputField'
-import PasswordField from '@/components/ui/PasswordField'
-import Button from '@/components/ui/Button'
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
+import FormPanel from "@/components/ui/FormPanel";
+import InputField from "@/components/ui/InputField";
+import PasswordField from "@/components/ui/PasswordField";
+import Button from "@/components/ui/Button";
 
 export default function CreateSpacePage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   // Form states for new space creation
-  const [spaceName, setSpaceName] = useState('')
-  const [emailCreate, setEmailCreate] = useState('')
-  const [passwordCreate, setPasswordCreate] = useState('')
-  
+  const [spaceName, setSpaceName] = useState("");
+  const [emailCreate, setEmailCreate] = useState("");
+  const [passwordCreate, setPasswordCreate] = useState("");
+
   // Form states for existing account login
-  const [emailExisting, setEmailExisting] = useState('')
-  
+  const [emailExisting, setEmailExisting] = useState("");
+
   // Email verification states
-  const [pin, setPin] = useState('')
-  const [step, setStep] = useState<'form' | 'verify'>('form')
-  const [verificationId, setVerificationId] = useState('')
-  
+  const [pin, setPin] = useState("");
+  const [step, setStep] = useState<"form" | "verify">("form");
+  const [verificationId, setVerificationId] = useState("");
+
   // UI states
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Get space name from URL parameters
-    const spaceParam = searchParams.get('space')
+    const spaceParam = searchParams.get("space");
     if (spaceParam) {
-      setSpaceName(spaceParam)
+      setSpaceName(spaceParam);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleCreateSpace = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!spaceName.trim()) {
-      setError('Please enter a space name.')
-      return
-    }
-    
-    if (!emailCreate.trim()) {
-      setError('Please enter your email address.')
-      return
-    }
-    
-    if (!passwordCreate) {
-      setError('Please create a password.')
-      return
+      setError("Please enter a space name.");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    if (!emailCreate.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    if (!passwordCreate) {
+      setError("Please create a password.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/spaces', {
-        method: 'POST',
+      const response = await fetch("/api/spaces", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id: spaceName.trim(),
           name: spaceName.trim(),
           email: emailCreate.trim(),
           password: passwordCreate,
-          verificationId: verificationId || undefined
-        })
-      })
+          verificationId: verificationId || undefined,
+        }),
+      });
 
-      const responseData = await response.json()
+      const responseData = await response.json();
 
       if (!response.ok) {
         if (responseData.requiresVerification) {
           // User doesn't exist, send verification email
-          await handleSendVerificationPin()
-          return
+          await handleSendVerificationPin();
+          return;
         } else {
-          throw new Error(responseData.error || 'Failed to create space')
+          throw new Error(responseData.error || "Failed to create space");
         }
       }
 
       // Redirect to the created space
-      router.push(`/${spaceName.trim()}`)
+      router.push(`/${spaceName.trim()}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create space')
+      setError(err instanceof Error ? err.message : "Failed to create space");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSendVerificationPin = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: emailCreate.trim(),
           spaceData: {
             id: spaceName.trim(),
-            name: spaceName.trim()
-          }
-        })
-      })
+            name: spaceName.trim(),
+          },
+        }),
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to send verification email')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send verification email");
       }
 
-      setStep('verify')
+      setStep("verify");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification email')
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification email",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyPin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!pin.trim()) {
-      setError('PIN is required')
-      return
+      setError("PIN is required");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: emailCreate.trim(),
-          pin: pin.trim()
-        })
-      })
+          pin: pin.trim(),
+        }),
+      });
 
-      const responseData = await response.json()
+      const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to verify PIN')
+        throw new Error(responseData.error || "Failed to verify PIN");
       }
 
       // PIN verified, now create the space
-      setVerificationId(responseData.spaceData?.id || 'verified')
-      setStep('form')
-      
+      setVerificationId(responseData.spaceData?.id || "verified");
+      setStep("form");
+
       // Automatically submit the form with verification
       setTimeout(() => {
-        handleCreateSpace(e)
-      }, 100)
+        handleCreateSpace(e);
+      }, 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to verify PIN')
+      setError(err instanceof Error ? err.message : "Failed to verify PIN");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleBackToForm = () => {
-    setStep('form')
-    setPin('')
-    setError('')
-  }
+    setStep("form");
+    setPin("");
+    setError("");
+  };
 
   const handleSendLoginLink = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!emailExisting.trim()) {
-      setError('Please enter your email address.')
-      return
+      setError("Please enter your email address.");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/login-token', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login-token", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: emailExisting.trim()
-        })
-      })
+          email: emailExisting.trim(),
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to send login link')
+        throw new Error("Failed to send login link");
       }
 
-      setError('')
-      alert('Login link sent to your email!')
+      setError("");
+      alert("Login link sent to your email!");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send login link')
+      setError(
+        err instanceof Error ? err.message : "Failed to send login link",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleReset = () => {
-    setSpaceName('')
-    setEmailCreate('')
-    setPasswordCreate('')
-    setError('')
-  }
+    setSpaceName("");
+    setEmailCreate("");
+    setPasswordCreate("");
+    setError("");
+  };
 
   const handleCancel = () => {
-    setEmailExisting('')
-    setError('')
-  }
+    setEmailExisting("");
+    setError("");
+  };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-start justify-center p-12 gap-6"
-      style={{ 
-        backgroundColor: 'var(--createspace-bg)',
-        color: 'var(--createspace-text)'
+      style={{
+        backgroundColor: "var(--createspace-bg)",
+        color: "var(--createspace-text)",
       }}
     >
-      <div 
+      <div
         className="w-full"
-        style={{ maxWidth: 'var(--createspace-max-width)' }}
+        style={{ maxWidth: "var(--createspace-max-width)" }}
       >
         {/* Header Section */}
         <header className="text-left mb-7 relative">
           <h1 className="text-4xl font-bold mb-3 tracking-tight">
-            {step === 'verify' ? 'Verify Your Email' : 'Create or Access Your Space'}
+            {step === "verify"
+              ? "Verify Your Email"
+              : "Create or Access Your Space"}
           </h1>
-          <p 
-            className="text-base" 
-            style={{ color: 'var(--createspace-muted)' }}
+          <p
+            className="text-base"
+            style={{ color: "var(--createspace-muted)" }}
           >
-            {step === 'verify' 
+            {step === "verify"
               ? `We've sent a 6-digit PIN to ${emailCreate}. Please enter it below to verify your email address.`
-              : 'Set up your new space or log in to an existing one — all in a single page.'
-            }
+              : "Set up your new space or log in to an existing one — all in a single page."}
           </p>
-          
+
           {/* Theme toggle button */}
           <div className="absolute top-0 right-0">
             <button
@@ -258,8 +265,10 @@ export default function CreateSpacePage() {
                          hover:border-blue-500 dark:hover:border-blue-400
                          transition-colors duration-200 shadow-sm"
               onClick={() => {
-                const themeToggle = document.querySelector('.icon-btn') as HTMLButtonElement
-                if (themeToggle) themeToggle.click()
+                const themeToggle = document.querySelector(
+                  ".icon-btn",
+                ) as HTMLButtonElement;
+                if (themeToggle) themeToggle.click();
               }}
               aria-label="Toggle theme"
             >
@@ -268,7 +277,7 @@ export default function CreateSpacePage() {
           </div>
         </header>
 
-        {step === 'verify' ? (
+        {step === "verify" ? (
           /* PIN Verification Section */
           <section className="max-w-md mx-auto">
             <FormPanel
@@ -278,8 +287,8 @@ export default function CreateSpacePage() {
             >
               <div className="flex-1">
                 <div className="mb-4">
-                  <label 
-                    htmlFor="pin" 
+                  <label
+                    htmlFor="pin"
                     className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2"
                   >
                     Verification PIN
@@ -288,7 +297,9 @@ export default function CreateSpacePage() {
                     type="text"
                     id="pin"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setPin(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg 
                                bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
@@ -316,19 +327,23 @@ export default function CreateSpacePage() {
               </div>
 
               {/* Actions */}
-              <div 
+              <div
                 className="mt-auto pt-4 flex gap-3 items-center"
-                style={{ 
-                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                  borderTopColor: 'var(--createspace-border-soft)'
+                style={{
+                  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                  borderTopColor: "var(--createspace-border-soft)",
                 }}
               >
-                <Button variant="slate" onClick={handleBackToForm} disabled={loading}>
+                <Button
+                  variant="slate"
+                  onClick={handleBackToForm}
+                  disabled={loading}
+                >
                   Back
                 </Button>
-                <Button 
-                  variant="blue" 
-                  type="submit" 
+                <Button
+                  variant="blue"
+                  type="submit"
                   disabled={loading || pin.length !== 6}
                 >
                   {loading ? (
@@ -337,7 +352,7 @@ export default function CreateSpacePage() {
                       Verifying...
                     </>
                   ) : (
-                    'Verify & Continue'
+                    "Verify & Continue"
                   )}
                 </Button>
               </div>
@@ -345,170 +360,189 @@ export default function CreateSpacePage() {
           </section>
         ) : (
           /* Original Main Layout */
-          <section 
+          <section
             className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] items-stretch"
-            style={{ gap: 'var(--createspace-gap)' }}
+            style={{ gap: "var(--createspace-gap)" }}
             aria-label="Create or access"
           >
-          {/* Left Panel: New Space */}
-          <FormPanel
-            title="New Space"
-            subtitle="Create a new space and an account to manage it."
-            onSubmit={handleCreateSpace}
-            className="lg:col-start-1"
-          >
-            <div className="flex-1">
-              <InputField
-                id="spaceName"
-                name="spaceName"
-                value={spaceName}
-                onChange={setSpaceName}
-                label="Space Name"
-                placeholder="e.g. marketing, product-team"
-                required
-                disabled={loading}
-              />
-
-              <InputField
-                id="emailCreate"
-                name="emailCreate"
-                type="email"
-                value={emailCreate}
-                onChange={setEmailCreate}
-                label="Email Address"
-                placeholder="your@email.com"
-                required
-                disabled={loading}
-              />
-
-              <div className="mb-4">
-                <label 
-                  htmlFor="passwordCreate" 
-                  className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2"
-                >
-                  Password
-                </label>
-                <PasswordField
-                  id="passwordCreate"
-                  name="passwordCreate"
-                  value={passwordCreate}
-                  onChange={setPasswordCreate}
-                  placeholder="Create a secure password"
+            {/* Left Panel: New Space */}
+            <FormPanel
+              title="New Space"
+              subtitle="Create a new space and an account to manage it."
+              onSubmit={handleCreateSpace}
+              className="lg:col-start-1"
+            >
+              <div className="flex-1">
+                <InputField
+                  id="spaceName"
+                  name="spaceName"
+                  value={spaceName}
+                  onChange={setSpaceName}
+                  label="Space Name"
+                  placeholder="e.g. marketing, product-team"
                   required
                   disabled={loading}
-                  showStrengthIndicator
-                  aria-describedby="pwHelp"
                 />
-                <div id="pwHelp" className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Use at least 8 characters, mix letters and numbers.
+
+                <InputField
+                  id="emailCreate"
+                  name="emailCreate"
+                  type="email"
+                  value={emailCreate}
+                  onChange={setEmailCreate}
+                  label="Email Address"
+                  placeholder="your@email.com"
+                  required
+                  disabled={loading}
+                />
+
+                <div className="mb-4">
+                  <label
+                    htmlFor="passwordCreate"
+                    className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2"
+                  >
+                    Password
+                  </label>
+                  <PasswordField
+                    id="passwordCreate"
+                    name="passwordCreate"
+                    value={passwordCreate}
+                    onChange={setPasswordCreate}
+                    placeholder="Create a secure password"
+                    required
+                    disabled={loading}
+                    showStrengthIndicator
+                    aria-describedby="pwHelp"
+                  />
+                  <div
+                    id="pwHelp"
+                    className="text-xs text-slate-500 dark:text-slate-400 mt-1"
+                  >
+                    Use at least 8 characters, mix letters and numbers.
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Actions */}
-            <div 
-              className="mt-auto pt-4 flex gap-3 items-center"
-              style={{ 
-                borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                borderTopColor: 'var(--createspace-border-soft)'
-              }}
-            >
-              <Button variant="slate" onClick={handleReset} disabled={loading}>
-                Reset
-              </Button>
-              <Button 
-                variant="blue" 
-                type="submit" 
-                disabled={loading || !spaceName.trim() || !emailCreate.trim() || !passwordCreate}
+              {/* Actions */}
+              <div
+                className="mt-auto pt-4 flex gap-3 items-center"
+                style={{
+                  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                  borderTopColor: "var(--createspace-border-soft)",
+                }}
               >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Space'
-                )}
-              </Button>
-            </div>
-          </FormPanel>
-
-          {/* Divider */}
-          <div 
-            className="hidden lg:block w-px"
-            style={{ backgroundColor: 'var(--createspace-border)' }}
-            role="separator"
-            aria-hidden="true"
-          />
-
-          {/* Right Panel: Existing Account */}
-          <FormPanel
-            title="Existing Account"
-            subtitle="Send a secure login link to access an existing space — no password required."
-            onSubmit={handleSendLoginLink}
-            className="lg:col-start-3"
-          >
-            <div className="flex-1">
-              <InputField
-                id="emailExisting"
-                name="emailExisting"
-                type="email"
-                value={emailExisting}
-                onChange={setEmailExisting}
-                label="Email Address"
-                placeholder="your@email.com"
-                required
-                disabled={loading}
-              />
-
-              <div 
-                className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800"
-                role="region"
-                aria-label="secure login explanation"
-              >
-                <div className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                  Secure Login
-                </div>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  We&apos;ll email a one-time secure login link. Links expire shortly for your protection.
-                </p>
+                <Button
+                  variant="slate"
+                  onClick={handleReset}
+                  disabled={loading}
+                >
+                  Reset
+                </Button>
+                <Button
+                  variant="blue"
+                  type="submit"
+                  disabled={
+                    loading ||
+                    !spaceName.trim() ||
+                    !emailCreate.trim() ||
+                    !passwordCreate
+                  }
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Space"
+                  )}
+                </Button>
               </div>
-            </div>
+            </FormPanel>
 
-            {/* Actions */}
-            <div 
-              className="mt-auto pt-4 flex gap-3 items-center"
-              style={{ 
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                borderTopColor: 'var(--createspace-border-soft)'
-              }}
+            {/* Divider */}
+            <div
+              className="hidden lg:block w-px"
+              style={{ backgroundColor: "var(--createspace-border)" }}
+              role="separator"
+              aria-hidden="true"
+            />
+
+            {/* Right Panel: Existing Account */}
+            <FormPanel
+              title="Existing Account"
+              subtitle="Send a secure login link to access an existing space — no password required."
+              onSubmit={handleSendLoginLink}
+              className="lg:col-start-3"
             >
-              <Button variant="rose" onClick={handleCancel} disabled={loading}>
-                Cancel
-              </Button>
-              <Button 
-                variant="amber" 
-                type="submit" 
-                disabled={loading || !emailExisting.trim()}
+              <div className="flex-1">
+                <InputField
+                  id="emailExisting"
+                  name="emailExisting"
+                  type="email"
+                  value={emailExisting}
+                  onChange={setEmailExisting}
+                  label="Email Address"
+                  placeholder="your@email.com"
+                  required
+                  disabled={loading}
+                />
+
+                <div
+                  className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800"
+                  role="region"
+                  aria-label="secure login explanation"
+                >
+                  <div className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                    Secure Login
+                  </div>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    We&apos;ll email a one-time secure login link. Links expire
+                    shortly for your protection.
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div
+                className="mt-auto pt-4 flex gap-3 items-center"
+                style={{
+                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                  borderTopColor: "var(--createspace-border-soft)",
+                }}
               >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  'Send Login Link'
-                )}
-              </Button>
-            </div>
-          </FormPanel>
-        </section>
+                <Button
+                  variant="rose"
+                  onClick={handleCancel}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="amber"
+                  type="submit"
+                  disabled={loading || !emailExisting.trim()}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Login Link"
+                  )}
+                </Button>
+              </div>
+            </FormPanel>
+          </section>
         )}
 
         {/* Error Display */}
         {error && (
           <div className="mt-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-            <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+            <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+              {error}
+            </p>
           </div>
         )}
 
@@ -518,5 +552,5 @@ export default function CreateSpacePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

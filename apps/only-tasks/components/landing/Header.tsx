@@ -1,32 +1,35 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { LucideGrid3X3, LucideMenu, LucideX } from 'lucide-react'
-import ThemeToggle from '@/components/ThemeToggle'
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { LucideGrid3X3, LucideMenu, LucideX } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navigation = [
-  { name: 'Features', href: '#features' },
-  { name: 'Demo', href: '/demo' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'About', href: '#about' },
-]
+  { name: "Features", href: "#features" },
+  { name: "Demo", href: "/demo" },
+  { name: "Pricing", href: "#pricing" },
+  { name: "About", href: "#about" },
+];
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const router = useRouter()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   const navigateToCreateSpace = () => {
-    router.push('/create-space')
-  }
+    router.push("/create-space");
+  };
 
   const navigateToDemo = () => {
-    router.push('/demo')
-  }
+    router.push("/demo");
+  };
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">
-      <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <nav
+        className="flex items-center justify-between p-6 lg:px-8"
+        aria-label="Global"
+      >
         {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
@@ -35,7 +38,9 @@ export default function Header() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg">
                 <LucideGrid3X3 className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white">OnlyTasks</span>
+              <span className="text-xl font-bold text-slate-900 dark:text-white">
+                OnlyTasks
+              </span>
             </div>
           </Link>
         </div>
@@ -95,7 +100,9 @@ export default function Header() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
                     <LucideGrid3X3 className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold text-slate-900 dark:text-white">OnlyTasks</span>
+                  <span className="text-lg font-bold text-slate-900 dark:text-white">
+                    OnlyTasks
+                  </span>
                 </div>
               </Link>
               <button
@@ -123,13 +130,15 @@ export default function Header() {
                 </div>
                 <div className="py-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Theme
+                    </span>
                     <ThemeToggle />
                   </div>
                   <button
                     onClick={() => {
-                      navigateToDemo()
-                      setMobileMenuOpen(false)
+                      navigateToDemo();
+                      setMobileMenuOpen(false);
                     }}
                     className="block w-full rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800"
                   >
@@ -137,8 +146,8 @@ export default function Header() {
                   </button>
                   <button
                     onClick={() => {
-                      navigateToCreateSpace()
-                      setMobileMenuOpen(false)
+                      navigateToCreateSpace();
+                      setMobileMenuOpen(false);
                     }}
                     className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-lg"
                   >
@@ -151,5 +160,5 @@ export default function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }

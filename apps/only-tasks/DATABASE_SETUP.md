@@ -15,6 +15,7 @@ DATABASE_URL=postgresql://username:password@host:port/database
 ### Default Connection
 
 If no `DATABASE_URL` is provided, the application will use the default connection string:
+
 ```
 postgresql://postgres:JtBLT51UWPYTHjpp@db.sbccoooiaanzamgqglhd.supabase.co:5432/postgres
 ```
@@ -32,10 +33,11 @@ To switch to a different database provider:
 3. Add the new database driver to dependencies
 
 Example for MySQL:
+
 ```typescript
 // lib/database/mysql.ts
-import { Database } from './types'
-import mysql from 'mysql2/promise'
+import { Database } from "./types";
+import mysql from "mysql2/promise";
 
 export class MySQLDatabase implements Database {
   // Implement all Database methods

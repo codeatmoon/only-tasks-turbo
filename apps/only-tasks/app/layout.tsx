@@ -1,13 +1,17 @@
-import './globals.css'
-import Script from 'next/script'
+import "./globals.css";
+import Script from "next/script";
 
 export const metadata = {
-  title: 'Task Tracker',
-  description: 'Minimal task tracker prototype'
-}
+  title: "Task Tracker",
+  description: "Minimal task tracker prototype",
+};
 
 // Using 'any' to avoid cross-package ReactNode type incompatibilities in monorepo
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -22,9 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}</Script>
       </head>
-      <body>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
-  )
+  );
 }

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { 
-  Geist, 
-  Geist_Mono, 
-  Inter, 
-  Poppins, 
-  Roboto, 
-  Playfair_Display, 
-  Source_Sans_3, 
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  Poppins,
+  Roboto,
+  Playfair_Display,
+  Source_Sans_3,
   JetBrains_Mono,
   Crimson_Text,
-  Lora
+  Lora,
 } from "next/font/google";
 import "./globals.css";
 import "../../../../packages/design-system-2/dist/index.css";

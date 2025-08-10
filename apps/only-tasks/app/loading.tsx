@@ -3,5 +3,5 @@ export default function Loading() {
     <main className="p-6">
       <p className="text-slate-600">Loading...</p>
     </main>
-  )
+  );
 }

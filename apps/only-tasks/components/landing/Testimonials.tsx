@@ -1,41 +1,44 @@
-'use client'
-import { LucideQuote, LucideStar } from 'lucide-react'
+"use client";
+import { LucideQuote, LucideStar } from "lucide-react";
 
 const testimonials = [
   {
     id: 1,
-    content: "OnlyTasks transformed how our team manages projects. The sprint-based approach and multiple views make it incredibly easy to track progress and stay organized.",
+    content:
+      "OnlyTasks transformed how our team manages projects. The sprint-based approach and multiple views make it incredibly easy to track progress and stay organized.",
     author: {
       name: "Sarah Chen",
       role: "Product Manager",
       company: "TechFlow",
-      image: "/api/placeholder/avatar/sarah-chen"
+      image: "/api/placeholder/avatar/sarah-chen",
     },
-    rating: 5
+    rating: 5,
   },
   {
     id: 2,
-    content: "The kanban and graph views are game-changers. We can see bottlenecks instantly and adjust our workflow accordingly. It's the best project management tool we've used.",
+    content:
+      "The kanban and graph views are game-changers. We can see bottlenecks instantly and adjust our workflow accordingly. It's the best project management tool we've used.",
     author: {
       name: "Michael Rodriguez",
       role: "Engineering Lead",
       company: "DataCorp",
-      image: "/api/placeholder/avatar/michael-rodriguez"
+      image: "/api/placeholder/avatar/michael-rodriguez",
     },
-    rating: 5
+    rating: 5,
   },
   {
     id: 3,
-    content: "Simple, beautiful, and powerful. OnlyTasks helps us ship faster and with better quality. The team collaboration features are exactly what we needed.",
+    content:
+      "Simple, beautiful, and powerful. OnlyTasks helps us ship faster and with better quality. The team collaboration features are exactly what we needed.",
     author: {
       name: "Emily Johnson",
       role: "Startup Founder",
       company: "InnovateHub",
-      image: "/api/placeholder/avatar/emily-johnson"
+      image: "/api/placeholder/avatar/emily-johnson",
     },
-    rating: 5
-  }
-]
+    rating: 5,
+  },
+];
 
 export default function Testimonials() {
   return (
@@ -71,7 +74,10 @@ export default function Testimonials() {
               {/* Rating Stars */}
               <div className="mb-4 flex items-center gap-1 pt-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <LucideStar key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <LucideStar
+                    key={i}
+                    className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                  />
                 ))}
               </div>
 
@@ -83,7 +89,10 @@ export default function Testimonials() {
               {/* Author */}
               <div className="mt-8 flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-semibold">
-                  {testimonial.author.name.split(' ').map(n => n[0]).join('')}
+                  {testimonial.author.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </div>
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-white">
@@ -122,5 +131,5 @@ export default function Testimonials() {
         </div>
       </div>
     </section>
-  )
+  );
 }

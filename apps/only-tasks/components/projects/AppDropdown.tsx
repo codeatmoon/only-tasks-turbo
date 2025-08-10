@@ -1,14 +1,22 @@
-'use client'
-import { useState } from 'react'
-import { LucideAppWindow } from 'lucide-react'
-import IconButton from '../ui/IconButton'
-import type { App } from '../../lib/types'
+"use client";
+import { useState } from "react";
+import { LucideAppWindow } from "lucide-react";
+import IconButton from "../ui/IconButton";
+import type { App } from "../../lib/types";
 
-export default function AppDropdown({ apps, value, onChange }: { apps: App[]; value?: string; onChange: (id: string) => void }) {
-  const [open, setOpen] = useState(false)
+export default function AppDropdown({
+  apps,
+  value,
+  onChange,
+}: {
+  apps: App[];
+  value?: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <IconButton title="Switch App" onClick={() => setOpen(o => !o)}>
+      <IconButton title="Switch App" onClick={() => setOpen((o) => !o)}>
         <LucideAppWindow size={16} />
       </IconButton>
       {open && (
@@ -18,12 +26,12 @@ export default function AppDropdown({ apps, value, onChange }: { apps: App[]; va
             <div
               key={a.id}
               className={
-                'px-3 py-2 rounded hover:bg-gray-50 cursor-pointer ' +
-                (a.id === value ? 'bg-gray-100' : '')
+                "px-3 py-2 rounded hover:bg-gray-50 cursor-pointer " +
+                (a.id === value ? "bg-gray-100" : "")
               }
               onClick={() => {
-                onChange(a.id)
-                setOpen(false)
+                onChange(a.id);
+                setOpen(false);
               }}
             >
               {a.name}
@@ -32,5 +40,5 @@ export default function AppDropdown({ apps, value, onChange }: { apps: App[]; va
         </div>
       )}
     </div>
-  )
+  );
 }

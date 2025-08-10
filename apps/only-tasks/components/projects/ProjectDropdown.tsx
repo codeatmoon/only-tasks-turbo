@@ -1,14 +1,22 @@
-'use client'
-import { useState } from 'react'
-import { LucideLayers } from 'lucide-react'
-import IconButton from '../ui/IconButton'
-import type { Project } from '../../lib/types'
+"use client";
+import { useState } from "react";
+import { LucideLayers } from "lucide-react";
+import IconButton from "../ui/IconButton";
+import type { Project } from "../../lib/types";
 
-export default function ProjectDropdown({ projects, value, onChange }: { projects: Project[]; value?: string; onChange: (id: string) => void }) {
-  const [open, setOpen] = useState(false)
+export default function ProjectDropdown({
+  projects,
+  value,
+  onChange,
+}: {
+  projects: Project[];
+  value?: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <IconButton title="Switch Project" onClick={() => setOpen(o => !o)}>
+      <IconButton title="Switch Project" onClick={() => setOpen((o) => !o)}>
         <LucideLayers size={16} />
       </IconButton>
       {open && (
@@ -18,12 +26,12 @@ export default function ProjectDropdown({ projects, value, onChange }: { project
             <div
               key={p.id}
               className={
-                'px-3 py-2 rounded hover:bg-gray-50 cursor-pointer ' +
-                (p.id === value ? 'bg-gray-100' : '')
+                "px-3 py-2 rounded hover:bg-gray-50 cursor-pointer " +
+                (p.id === value ? "bg-gray-100" : "")
               }
               onClick={() => {
-                onChange(p.id)
-                setOpen(false)
+                onChange(p.id);
+                setOpen(false);
               }}
             >
               {p.name}
@@ -32,5 +40,5 @@ export default function ProjectDropdown({ projects, value, onChange }: { project
         </div>
       )}
     </div>
-  )
+  );
 }
