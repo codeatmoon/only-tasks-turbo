@@ -14,10 +14,12 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@scss-theming/design-system-2": "*",
     "@types/bcryptjs": "^2.4.6",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.15.5",
     "bcryptjs": "^3.0.2",
+    "firebase": "^12.1.0",
     "firebase-admin": "^12.6.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.539.0",
@@ -25,8 +27,7 @@
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "@scss-theming/design-system-2": "*"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

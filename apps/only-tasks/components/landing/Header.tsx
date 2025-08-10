@@ -16,10 +16,6 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
-  const navigateToCreateSpace = () => {
-    router.push("/create-space");
-  };
-
   const navigateToDemo = () => {
     router.push("/demo");
   };
@@ -80,10 +76,10 @@ export default function Header() {
             Try Demo
           </button>
           <button
-            onClick={navigateToCreateSpace}
+            onClick={navigateToDemo}
             className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
           >
-            Get Started
+            Try Demo
           </button>
         </div>
       </nav>
@@ -146,12 +142,12 @@ export default function Header() {
                   </button>
                   <button
                     onClick={() => {
-                      navigateToCreateSpace();
+                      navigateToDemo();
                       setMobileMenuOpen(false);
                     }}
                     className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-lg"
                   >
-                    Get Started
+                    Try Demo
                   </button>
                 </div>
               </div>
