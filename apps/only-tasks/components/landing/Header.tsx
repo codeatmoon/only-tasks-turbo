@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LucideGrid3X3, LucideMenu, LucideX } from "lucide-react";
+import { LucideGrid3X3, LucideMenu, LucideX, LucideUser, LucideLogIn } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAuth } from "@/lib/auth-context";
 
 const navigation = [
   { name: "Features", href: "#features" },
@@ -15,9 +16,18 @@ const navigation = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAuth();
 
-  const navigateToDemo = () => {
-    router.push("/demo");
+  const navigateToDashboard = () => {
+    router.push("/dashboard");
+  };
+
+  const navigateToLogin = () => {
+    router.push("/login");
+  };
+
+  const navigateToSignup = () => {
+    router.push("/signup");
   };
 
   return (
@@ -69,18 +79,35 @@ export default function Header() {
         {/* Desktop actions */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 items-center">
           <ThemeToggle />
-          <button
-            onClick={navigateToDemo}
-            className="text-sm font-semibold leading-6 text-slate-900 hover:text-blue-600 transition-colors dark:text-white dark:hover:text-blue-400"
-          >
-            Try Demo
-          </button>
-          <button
-            onClick={navigateToDemo}
-            className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
-          >
-            Try Demo
-          </button>
+          {!loading && (
+            <>
+              {user ? (
+                <button
+                  onClick={navigateToDashboard}
+                  className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-xl flex items-center gap-2"
+                >
+                  <LucideUser size={16} />
+                  Dashboard
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={navigateToLogin}
+                    className="text-sm font-semibold leading-6 text-slate-900 hover:text-blue-600 transition-colors dark:text-white dark:hover:text-blue-400 flex items-center gap-2"
+                  >
+                    <LucideLogIn size={16} />
+                    Log In
+                  </button>
+                  <button
+                    onClick={navigateToSignup}
+                    className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
+            </>
+          )}
         </div>
       </nav>
 
@@ -131,24 +158,44 @@ export default function Header() {
                     </span>
                     <ThemeToggle />
                   </div>
-                  <button
-                    onClick={() => {
-                      navigateToDemo();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800"
-                  >
-                    Try Demo
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigateToDemo();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-lg"
-                  >
-                    Try Demo
-                  </button>
+                  {!loading && (
+                    <>
+                      {user ? (
+                        <button
+                          onClick={() => {
+                            navigateToDashboard();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-lg flex items-center justify-center gap-2"
+                        >
+                          <LucideUser size={16} />
+                          Dashboard
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => {
+                              navigateToLogin();
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block w-full rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800 flex items-center justify-center gap-2"
+                          >
+                            <LucideLogIn size={16} />
+                            Log In
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigateToSignup();
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-lg"
+                          >
+                            Sign Up
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
