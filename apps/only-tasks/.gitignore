@@ -21,6 +21,10 @@ logs/
 .env.local
 .env.*.local
 
+# Firebase service account keys
+only-tasks-app-firebase-adminsdk-*.json
+firebase-*.json
+
 # Locks
 yarn.lock
 pnpm-lock.yaml
@@ -37,3 +41,5 @@ coverage/
 .vscode/**
 !.vscode/extensions.json
 .idea/
+.env.*
+only-tasks-app-firebase-adminsdk-fbsvc-d012b74ea9.json

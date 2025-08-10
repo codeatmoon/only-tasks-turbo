@@ -36,3 +36,4 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+apps/only-tasks/only-tasks-app-firebase-adminsdk-fbsvc-d012b74ea9.json
