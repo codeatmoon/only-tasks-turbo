@@ -24,6 +24,7 @@ export default function SpacePage() {
   const [userOwnsSpace, setUserOwnsSpace] = useState<boolean | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [lastSel] = useLocalStorage<{ projectId?: string; appId?: string }>(
     `${spaceid}-lastSel`,
     {},
@@ -107,20 +108,21 @@ export default function SpacePage() {
     }
 
     setLoading(true);
+    setApiError(null);
     try {
       // Check if space exists and if user owns it
       const spaceResponse = await authenticatedFetch(`/api/spaces?id=${spaceid}`);
 
       if (spaceResponse.ok) {
         setSpaceExists(true);
-        
+
         // Check if the authenticated user owns the space
         // We'll compare the Firebase UID with the space owner
         const ownershipResponse = await authenticatedFetch(`/api/spaces/${spaceid}/ownership`);
         if (ownershipResponse.ok) {
           const { owns } = await ownershipResponse.json();
           setUserOwnsSpace(owns);
-          
+
           if (owns) {
             // Load projects if user owns the space
             const projectsResponse = await authenticatedFetch(`/api/spaces/${spaceid}/projects`);
@@ -141,13 +143,11 @@ export default function SpacePage() {
         setUserOwnsSpace(false);
       } else {
         console.error("Error checking space");
-        setSpaceExists(false);
-        setUserOwnsSpace(false);
+        setApiError("Failed to check space");
       }
     } catch (error) {
       console.error("Error checking space access:", error);
-      setSpaceExists(false);
-      setUserOwnsSpace(false);
+      setApiError("Network error while checking space access");
     } finally {
       setLoading(false);
     }
@@ -163,7 +163,7 @@ export default function SpacePage() {
   useEffect(() => {
     const loadTheme = async () => {
       if (!user || !userOwnsSpace) return;
-      
+
       try {
         const res = await authenticatedFetch(`/api/spaces/${spaceid}/theme`);
         if (res.ok) {
@@ -175,10 +175,10 @@ export default function SpacePage() {
           };
           const t: ThemeState = theme
             ? {
-                theme_name: theme.theme_name,
-                mode: theme.mode,
-                brand: theme.brand ?? null,
-              }
+              theme_name: theme.theme_name,
+              mode: theme.mode,
+              brand: theme.brand ?? null,
+            }
             : defaultTheme;
           setTheme(t);
           applyTheme(t);
@@ -216,11 +216,11 @@ export default function SpacePage() {
       const newProjects = projects.map((p) =>
         p.id === currentProject.id
           ? {
-              ...p,
-              apps: p.apps.map((a) =>
-                a.id === currentApp.id ? updater(a) : a,
-              ),
-            }
+            ...p,
+            apps: p.apps.map((a) =>
+              a.id === currentApp.id ? updater(a) : a,
+            ),
+          }
           : p,
       );
       setProjects(newProjects);
@@ -301,11 +301,11 @@ export default function SpacePage() {
         sprints: app.sprints.map((s) =>
           s.id === sprintId
             ? {
-                ...s,
-                tasks: s.tasks.map((t) =>
-                  t.id === taskId ? { ...t, ...partial } : t,
-                ),
-              }
+              ...s,
+              tasks: s.tasks.map((t) =>
+                t.id === taskId ? { ...t, ...partial } : t,
+              ),
+            }
             : s,
         ),
       }));
@@ -330,16 +330,39 @@ export default function SpacePage() {
     );
   }
 
-  // Show login form if not authenticated or doesn't own space
-  if (!user || userOwnsSpace === false) {
+  // Show login form if not authenticated or doesn't own space (but not for API/network errors)
+  if (!user || (userOwnsSpace === false && !apiError)) {
     return (
-      <LoginForm 
-        spaceId={spaceid} 
+      <LoginForm
+        spaceId={spaceid}
         onSuccess={() => {
           // Refresh the page after successful login
           window.location.reload();
         }}
       />
+    );
+  }
+
+  // Show API error state
+  if (apiError) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Something went wrong
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
+          <button
+            onClick={() => {
+              setApiError(null);
+              checkSpaceAccess();
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
     );
   }
 
