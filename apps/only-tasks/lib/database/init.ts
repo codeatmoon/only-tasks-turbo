@@ -2,6 +2,15 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { getDatabase } from "./client";
 
+// Types for PostgreSQL query results
+interface TableRow {
+  table_name: string
+}
+
+interface ColumnRow {
+  column_name: string
+}
+
 export async function initializeSchema(): Promise<void> {
   const db = getDatabase();
 
@@ -139,7 +148,6 @@ export async function initializeSchema(): Promise<void> {
           const hasRole = userColumns.rows.some(
             (r: any) => r.column_name === "role",
           );
-
           if (!hasUserId || !hasRole) {
             console.log("Users table has incorrect schema, need to migrate...");
             // Drop and recreate tables that depend on the users table
