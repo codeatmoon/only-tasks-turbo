@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { 
-  User, 
-  onAuthStateChanged, 
+import {
+  User,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup, 
+  signInWithPopup,
   signOut,
   sendPasswordResetEmail,
   sendSignInLinkToEmail,
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
-    
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -76,14 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!auth) {
         throw new Error("Firebase authentication is not properly configured");
       }
-      
+
       const actionCodeSettings = {
-        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/auth/verify`,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/verify`,
         handleCodeInApp: true,
       };
-      
+
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      
+
       // Save the email locally so we can retrieve it after the user clicks the link
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('emailForSignIn', email);
@@ -99,9 +99,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!auth) {
         throw new Error("Firebase authentication is not properly configured");
       }
-      
+
       await signInWithEmailLink(auth, email, emailLink);
-      
+
       // Clear the email from local storage
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem('emailForSignIn');

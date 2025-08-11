@@ -16,7 +16,7 @@ An advanced SCSS theming system demonstration using Turborepo, Next.js, and Type
 ### Development Workflow
 - **Start all development servers**: `yarn dev` 
   - **WARNING**: The global `yarn dev` command may hang. Use individual app commands instead:
-  - **Only-tasks app**: `cd apps/only-tasks && npm run dev` -- runs on http://localhost:3001 (port 3000 is occupied)
+  - **Only-tasks app**: `cd apps/only-tasks && npm run dev` -- runs on http://localhost:3000 (port 3000 is occupied)
   - **Themes-demo app**: `cd apps/themes-demo && npm run dev` -- runs on http://localhost:7002
 - **Build individual apps**: `yarn build --filter=only-tasks` or `yarn build --filter=demo-css-props`
 - **Run individual commands**: Use Turborepo filters like `yarn lint --filter=only-tasks`
@@ -158,9 +158,9 @@ cd packages/design-system-2 && yarn dev # Watch SCSS compilation
 ```
 
 ### URLs and Ports
-- **Only-tasks app**: http://localhost:3001 (or 3000 if available)
+- **Only-tasks app**: http://localhost:3000 (or 3001 if available)
 - **Themes-demo app**: http://localhost:7002
-- **Demo path**: http://localhost:3001/demo (task management interface)
+- **Demo path**: http://localhost:3000/demo (task management interface)
 
 ### Testing Scenarios
 1. **Complete task workflow**: Create task → assign → move through statuses → analytics

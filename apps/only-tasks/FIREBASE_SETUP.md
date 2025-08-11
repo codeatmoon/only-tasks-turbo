@@ -35,7 +35,7 @@ This guide explains how to configure Firebase authentication for OnlyTasks, incl
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-measurement-id
 
    # App URL (for email link verification)
-   NEXT_PUBLIC_APP_URL=http://localhost:3001
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
 
 ## Authentication Methods Available
