@@ -7,7 +7,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SignupPage() {
-  const { user, loading, signInWithEmail, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithEmail, signUpWithEmail, sendMagicLink, signInWithGoogle } = useAuth();
   const router = useRouter();
   
   // Form states
@@ -22,6 +22,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const [authMethod, setAuthMethod] = useState<"password" | "magic-link">("password");
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -38,6 +40,23 @@ export default function SignupPage() {
       return;
     }
 
+    // For magic link authentication, we only need email
+    if (authMethod === "magic-link") {
+      setIsLoading(true);
+      setError("");
+      
+      try {
+        await sendMagicLink(email);
+        setMagicLinkSent(true);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to send magic link");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // For password authentication, validate based on mode
     if (mode === "signup") {
       if (!name.trim()) {
         setError("Please enter your name.");
@@ -69,7 +88,11 @@ export default function SignupPage() {
     setError("");
     
     try {
-      await signInWithEmail(email, password);
+      if (mode === "signup") {
+        await signUpWithEmail(email, password);
+      } else {
+        await signInWithEmail(email, password);
+      }
       router.push("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : `Failed to ${mode === "signup" ? "create account" : "sign in"}`);
@@ -185,6 +208,38 @@ export default function SignupPage() {
             </button>
           </div>
 
+          {/* Authentication Method Toggle */}
+          <div className="flex mb-6 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <button
+              onClick={() => {
+                setAuthMethod("password");
+                setMagicLinkSent(false);
+                setError("");
+              }}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                authMethod === "password" 
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" 
+                  : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              Password
+            </button>
+            <button
+              onClick={() => {
+                setAuthMethod("magic-link");
+                setMagicLinkSent(false);
+                setError("");
+              }}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                authMethod === "magic-link" 
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" 
+                  : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              Magic Link
+            </button>
+          </div>
+
           {/* Google Sign In */}
           <button
             type="button"
@@ -224,114 +279,155 @@ export default function SignupPage() {
 
           {/* Email Form */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-            {error && (
-              <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-4">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleEmailAuth} className="space-y-4">
-              {mode === "signup" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your full name"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  />
+            {magicLinkSent ? (
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-green-600 dark:text-green-400 text-xl">✓</span>
                 </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Check your email
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  We&apos;ve sent a magic link to <strong>{email}</strong>. Click the link in your email to sign in.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Don&apos;t see the email? Check your spam folder.
+                </p>
+                <button
+                  onClick={() => {
+                    setMagicLinkSent(false);
+                    setEmail("");
+                  }}
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm"
+                >
+                  Try with a different email
+                </button>
               </div>
+            ) : (
+              <>
+                {error && (
+                  <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-4">
+                    {error}
+                  </div>
+                )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
-                    required
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  />
+                <form onSubmit={handleEmailAuth} className="space-y-4">
+                  {mode === "signup" && authMethod === "password" && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your full name"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  {authMethod === "password" && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
+                            required
+                            className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                          />
+                          <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4 text-gray-400" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {mode === "signup" && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Confirm Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showConfirmPassword ? "text" : "password"}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Confirm your password"
+                              required
+                              className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOff className="h-4 w-4 text-gray-400" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-gray-400" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
                   <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
+                    type="submit"
+                    disabled={isLoading || !email || (authMethod === "password" && (!password || (mode === "signup" && (!name || !confirmPassword))))}
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {authMethod === "magic-link" 
+                          ? "Sending Magic Link..." 
+                          : mode === "signup" 
+                            ? "Creating Account..." 
+                            : "Signing In..."
+                        }
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      authMethod === "magic-link" 
+                        ? "Send Magic Link" 
+                        : mode === "signup" 
+                          ? "Create Account" 
+                          : "Sign In"
                     )}
                   </button>
-                </div>
-              </div>
-
-              {mode === "signup" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm your password"
-                      required
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading || !email || !password || (mode === "signup" && (!name || !confirmPassword))}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {mode === "signup" ? "Creating Account..." : "Signing In..."}
-                  </>
-                ) : (
-                  mode === "signup" ? "Create Account" : "Sign In"
-                )}
-              </button>
-            </form>
+                </form>
+              </>
+            )}
           </div>
 
           <div className="mt-6 text-center">
