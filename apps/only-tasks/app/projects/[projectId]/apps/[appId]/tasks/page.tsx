@@ -27,7 +27,7 @@ export default function TasksPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   
   // Use different storage keys based on whether this is a user session or demo
-  const storagePrefix = user ? "user" : "demo";
+  const storagePrefix = useMemo(() => user ? "user" : "demo", [user]);
   const [view, setView] = useLocalStorage<"sheet" | "kanban" | "graph">(
     `${storagePrefix}-viewMode`,
     "sheet",
@@ -38,7 +38,6 @@ export default function TasksPage() {
     mode: "light" | "dark";
     brand?: "brand-a" | "brand-b" | null;
   };
-  const [, setTheme] = useState<ThemeState | null>(null);
 
   const applyTheme = useCallback(
     (t: {
@@ -57,7 +56,6 @@ export default function TasksPage() {
       if (t.brand) {
         root.classList.add(t.brand);
       }
-      setTheme(t as ThemeState);
     },
     [],
   );
@@ -95,7 +93,7 @@ export default function TasksPage() {
     if (!authLoading) {
       loadData();
     }
-  }, [user, authLoading, apiError, authenticatedFetch, storagePrefix]);
+  }, [user, authLoading, apiError, storagePrefix]); // Removed authenticatedFetch
 
   // Load theme
   useEffect(() => {
@@ -120,7 +118,7 @@ export default function TasksPage() {
     if (!authLoading) {
       loadTheme();
     }
-  }, [user, authLoading, apiError, authenticatedFetch, applyTheme]);
+  }, [user, authLoading, apiError, applyTheme]); // Removed authenticatedFetch
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === projectId);
