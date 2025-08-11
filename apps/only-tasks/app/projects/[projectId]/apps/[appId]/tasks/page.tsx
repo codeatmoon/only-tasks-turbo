@@ -17,7 +17,6 @@ export default function TasksPage() {
   const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading, logout } = useAuth();
-  const authenticatedFetch = createAuthenticatedFetch();
 
   const projectId = params.projectId as string;
   const appId = params.appId as string;
@@ -59,8 +58,10 @@ export default function TasksPage() {
     const loadData = async () => {
       try {
         if (user && !apiError) {
+          // Create authenticated fetch inside the function to avoid dependency issues
+          const authenticatedFetch = createAuthenticatedFetch();
           // Try to load from API for authenticated users
-          const response = await authenticatedFetch("/api/spaces/user/projects");
+          const response = await authenticatedFetch("/api/user/projects");
           if (response.ok) {
             const data = await response.json();
             setProjects(data.projects || []);
@@ -87,14 +88,16 @@ export default function TasksPage() {
     if (!authLoading) {
       loadData();
     }
-  }, [user, authLoading, apiError, storagePrefix, authenticatedFetch]);
+  }, [user, authLoading, apiError, storagePrefix]);
 
   // Load theme
   useEffect(() => {
     const loadTheme = async () => {
       try {
         if (user && !apiError) {
-          const response = await authenticatedFetch("/api/spaces/user/theme");
+          // Create authenticated fetch inside the function to avoid dependency issues
+          const authenticatedFetch = createAuthenticatedFetch();
+          const response = await authenticatedFetch("/api/user/theme");
           if (response.ok) {
             const theme = await response.json();
             applyTheme(theme);
@@ -112,7 +115,7 @@ export default function TasksPage() {
     if (!authLoading) {
       loadTheme();
     }
-  }, [user, authLoading, apiError, applyTheme, authenticatedFetch]);
+  }, [user, authLoading, apiError, applyTheme]);
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === projectId);
