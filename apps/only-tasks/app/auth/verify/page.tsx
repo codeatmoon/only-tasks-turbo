@@ -17,11 +17,40 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const verifyEmailLink = async () => {
       try {
+        const emailLink = window.location.href;
+        const apiKey = searchParams.get('apiKey');
+
+        // Handle apiKey verification (non-Firebase magic links)
+        if (apiKey) {
+          try {
+            const response = await fetch(`/api/auth/verify?apiKey=${apiKey}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.error || "API key verification failed");
+            }
+
+            // If API key is verified successfully, redirect as suggested
+            if (data.redirect) {
+              router.push(data.redirect);
+              return;
+            }
+
+            // Default success case
+            router.push("/signup?verified=true");
+            return;
+          } catch (err: unknown) {
+            console.error("Error verifying API key:", err);
+            setError(err instanceof Error ? err.message : "Failed to verify API key");
+            setIsVerifying(false);
+            return;
+          }
+        }
+
+        // Handle Firebase magic links
         if (!auth) {
           throw new Error("Firebase authentication is not properly configured");
         }
-
-        const emailLink = window.location.href;
         
         // Check if the link is a valid sign-in link
         if (!isSignInWithEmailLink(auth, emailLink)) {
