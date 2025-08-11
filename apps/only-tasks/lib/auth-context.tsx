@@ -10,8 +10,7 @@ import {
   signOut,
   sendPasswordResetEmail,
   sendSignInLinkToEmail,
-  signInWithEmailLink,
-  isSignInWithEmailLink
+  signInWithEmailLink
 } from "firebase/auth";
 import { auth, googleProvider } from "./firebase";
 
