@@ -20,7 +20,6 @@ interface TasksPageProps {
 export default function TasksPage({ spaceid }: TasksPageProps) {
   const router = useRouter();
   const { user, loading: authLoading, logout } = useAuth();
-  const authenticatedFetch = createAuthenticatedFetch();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +90,8 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
     setLoading(true);
     setApiError(null);
     try {
+      // Create authenticated fetch inside the function to avoid dependency issues
+      const authenticatedFetch = createAuthenticatedFetch();
       // For authenticated users, try to load from API
       // If spaceid is provided, use space-specific API, otherwise use user's default projects
       const endpoint = spaceid 
@@ -111,7 +112,7 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
     } finally {
       setLoading(false);
     }
-  }, [user, authLoading, authenticatedFetch, spaceid]);
+  }, [user, authLoading, spaceid]);
 
   useEffect(() => {
     loadProjects();
@@ -123,6 +124,8 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
       if (!user) return;
 
       try {
+        // Create authenticated fetch inside the function to avoid dependency issues
+        const authenticatedFetch = createAuthenticatedFetch();
         const endpoint = spaceid 
           ? `/api/spaces/${spaceid}/theme`
           : `/api/user/theme`;
@@ -157,8 +160,7 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
       }
     };
     loadTheme();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, spaceid, applyTheme]);
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === lastSel.projectId) ?? projects[0];
@@ -219,6 +221,8 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
       }
 
       try {
+        // Create authenticated fetch inside the function to avoid dependency issues
+        const authenticatedFetch = createAuthenticatedFetch();
         // Create task in database for authenticated users
         const endpoint = spaceid 
           ? `/api/spaces/${spaceid}/tasks`
@@ -252,7 +256,7 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
         alert("Failed to create task. Please try again.");
       }
     },
-    [updateCurrentApp, currentApp, currentProject, spaceid, authenticatedFetch, user],
+    [updateCurrentApp, currentApp, currentProject, spaceid, user],
   );
 
   const handleLogout = useCallback(async () => {
@@ -288,6 +292,8 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
     }
 
     try {
+      // Create authenticated fetch inside the function to avoid dependency issues
+      const authenticatedFetch = createAuthenticatedFetch();
       // Update task in database for authenticated users
       const endpoint = spaceid 
         ? `/api/spaces/${spaceid}/tasks/${taskId}`

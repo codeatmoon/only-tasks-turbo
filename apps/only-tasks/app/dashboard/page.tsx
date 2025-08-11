@@ -9,7 +9,6 @@ import { createAuthenticatedFetch } from "@/lib/auth-utils";
 export default function ProjectsDashboard() {
   const router = useRouter();
   const { user, loading: authLoading, logout } = useAuth();
-  const authenticatedFetch = createAuthenticatedFetch();
   
   const [dark, setDark] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -43,6 +42,8 @@ export default function ProjectsDashboard() {
       
       setLoading(true);
       try {
+        // Create authenticated fetch inside the function to avoid dependency issues
+        const authenticatedFetch = createAuthenticatedFetch();
         // Try to load user's projects from API
         const response = await authenticatedFetch("/api/user/projects");
         if (response.ok) {
@@ -64,7 +65,7 @@ export default function ProjectsDashboard() {
     if (!authLoading) {
       loadProjects();
     }
-  }, [user, authLoading, authenticatedFetch]);
+  }, [user, authLoading]);
 
   const createProject = useCallback(async () => {
     if (!newProjectName.trim() || !user) return;
@@ -77,6 +78,8 @@ export default function ProjectsDashboard() {
     };
 
     try {
+      // Create authenticated fetch inside the function to avoid dependency issues
+      const authenticatedFetch = createAuthenticatedFetch();
       // Try to save to API
       const response = await authenticatedFetch("/api/user/projects", {
         method: "POST",
@@ -99,7 +102,7 @@ export default function ProjectsDashboard() {
 
     setNewProjectName("");
     setShowCreateProject(false);
-  }, [newProjectName, user, authenticatedFetch, projects]);
+  }, [newProjectName, user, projects]);
 
   const addApp = useCallback(async () => {
     if (!newAppName.trim() || activeProjectId == null || !user) return;
@@ -111,6 +114,8 @@ export default function ProjectsDashboard() {
     };
 
     try {
+      // Create authenticated fetch inside the function to avoid dependency issues
+      const authenticatedFetch = createAuthenticatedFetch();
       // Try to save to API
       const response = await authenticatedFetch(`/api/user/projects/${activeProjectId}/apps`, {
         method: "POST",
@@ -140,7 +145,7 @@ export default function ProjectsDashboard() {
 
     setNewAppName("");
     setShowAddApp(false);
-  }, [newAppName, activeProjectId, user, authenticatedFetch, projects]);
+  }, [newAppName, activeProjectId, user, projects]);
 
   const addSprint = useCallback(async () => {
     if (!newSprintName.trim() || activeProjectId == null || activeAppId == null || !user) return;
@@ -182,6 +187,8 @@ export default function ProjectsDashboard() {
     };
 
     try {
+      // Create authenticated fetch inside the function to avoid dependency issues
+      const authenticatedFetch = createAuthenticatedFetch();
       // Try to save to API
       const response = await authenticatedFetch(`/api/user/projects/${activeProjectId}/apps/${activeAppId}/sprints`, {
         method: "POST",
@@ -225,7 +232,7 @@ export default function ProjectsDashboard() {
     setNewSprintStart("");
     setNewSprintEnd("");
     setShowAddSprint(false);
-  }, [newSprintName, newSprintStart, newSprintEnd, activeProjectId, activeAppId, user, authenticatedFetch, projects]);
+  }, [newSprintName, newSprintStart, newSprintEnd, activeProjectId, activeAppId, user, projects]);
 
   const openTasks = useCallback((projectId: string, appId: string) => {
     router.push(`/projects/${projectId}/apps/${appId}/tasks`);
