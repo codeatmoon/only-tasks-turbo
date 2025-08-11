@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LucideGrid3X3, LucideMenu, LucideX, LucideUser, LucideLogIn } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth-context";
+import InlineSigninModal from "@/components/auth/InlineSigninModal";
 
 const navigation = [
   { name: "Features", href: "#features" },
@@ -15,6 +16,7 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [signinModalOpen, setSigninModalOpen] = useState(false);
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -22,12 +24,16 @@ export default function Header() {
     router.push("/dashboard");
   };
 
-  const navigateToLogin = () => {
-    router.push("/login");
-  };
-
   const navigateToSignup = () => {
     router.push("/signup");
+  };
+
+  const openSigninModal = () => {
+    setSigninModalOpen(true);
+  };
+
+  const closeSigninModal = () => {
+    setSigninModalOpen(false);
   };
 
   return (
@@ -92,7 +98,7 @@ export default function Header() {
               ) : (
                 <>
                   <button
-                    onClick={navigateToLogin}
+                    onClick={openSigninModal}
                     className="text-sm font-semibold leading-6 text-slate-900 hover:text-blue-600 transition-colors dark:text-white dark:hover:text-blue-400 flex items-center gap-2"
                   >
                     <LucideLogIn size={16} />
@@ -175,7 +181,7 @@ export default function Header() {
                         <>
                           <button
                             onClick={() => {
-                              navigateToLogin();
+                              openSigninModal();
                               setMobileMenuOpen(false);
                             }}
                             className="block w-full rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800 flex items-center justify-center gap-2"
@@ -202,6 +208,12 @@ export default function Header() {
           </div>
         </div>
       )}
+      
+      {/* Inline Signin Modal */}
+      <InlineSigninModal 
+        isOpen={signinModalOpen} 
+        onClose={closeSigninModal} 
+      />
     </header>
   );
 }

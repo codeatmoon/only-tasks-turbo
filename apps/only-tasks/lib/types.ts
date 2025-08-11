@@ -48,5 +48,6 @@ export interface App {
 export interface Project {
   id: string;
   name: string;
+  description?: string;
   apps: App[];
 }
