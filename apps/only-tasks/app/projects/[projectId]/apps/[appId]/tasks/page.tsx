@@ -33,12 +33,6 @@ export default function TasksPage() {
     "sheet",
   );
 
-  type ThemeState = {
-    theme_name: "theme-1" | "theme-2";
-    mode: "light" | "dark";
-    brand?: "brand-a" | "brand-b" | null;
-  };
-
   const applyTheme = useCallback(
     (t: {
       theme_name: string;
@@ -93,7 +87,7 @@ export default function TasksPage() {
     if (!authLoading) {
       loadData();
     }
-  }, [user, authLoading, apiError, storagePrefix]); // Removed authenticatedFetch
+  }, [user, authLoading, apiError, storagePrefix, authenticatedFetch]);
 
   // Load theme
   useEffect(() => {
@@ -118,7 +112,7 @@ export default function TasksPage() {
     if (!authLoading) {
       loadTheme();
     }
-  }, [user, authLoading, apiError, applyTheme]); // Removed authenticatedFetch
+  }, [user, authLoading, apiError, applyTheme, authenticatedFetch]);
 
   const currentProject = useMemo(() => {
     return projects.find((p) => p.id === projectId);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyFirebaseToken } from '@/lib/server-auth-utils';
+import type { Project } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     // TODO: Load user-specific projects from database
     // For now, return empty array to start fresh for authenticated users
-    const projects: any[] = [];
+    const projects: Project[] = [];
 
     return NextResponse.json({ projects });
   } catch (error) {

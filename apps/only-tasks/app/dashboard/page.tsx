@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sun, Moon, Plus, Folder, AppWindow, Calendar, Edit3, Play, LogOut, User } from "lucide-react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { projects as mockProjects } from "@/data/mockData";
+import { Sun, Moon, Plus, Folder, AppWindow, Calendar, Edit3, Play, LogOut } from "lucide-react";
 import type { Project, App as AppType } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
 import { createAuthenticatedFetch } from "@/lib/auth-utils";
