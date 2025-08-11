@@ -5,7 +5,7 @@ import TaskTable from "@/components/tasks/TaskTable";
 import KanbanBoard from "@/components/tasks/KanbanBoard";
 import TaskGraph from "@/components/tasks/TaskGraph";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { LucideSettings, LucideLoader } from "lucide-react";
+import { LucideSettings, LucideLoader, LucideLogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 import ViewSelector from "@/components/ViewSelector";
@@ -19,7 +19,7 @@ interface TasksPageProps {
 
 export default function TasksPage({ spaceid }: TasksPageProps) {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const authenticatedFetch = createAuthenticatedFetch();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -255,6 +255,15 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
     [updateCurrentApp, currentApp, currentProject, spaceid, authenticatedFetch, user],
   );
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  }, [logout, router]);
+
   const onEditTask = async (
     sprintId: string,
     taskId: string,
@@ -369,6 +378,15 @@ export default function TasksPage({ spaceid }: TasksPageProps) {
               >
                 <LucideSettings size={16} />
               </button>
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="icon-btn text-red-600 hover:text-red-700"
+                  title="Logout"
+                >
+                  <LucideLogOut size={16} />
+                </button>
+              )}
               <ViewSelector currentView={view} onViewChange={setView} />
               <ThemeToggle />
             </div>

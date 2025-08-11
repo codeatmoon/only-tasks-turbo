@@ -6,7 +6,7 @@ import TaskTable from "@/components/tasks/TaskTable";
 import KanbanBoard from "@/components/tasks/KanbanBoard";
 import TaskGraph from "@/components/tasks/TaskGraph";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { LucideArrowLeft, LucideSettings } from "lucide-react";
+import { LucideArrowLeft, LucideSettings, LucideLogOut } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ViewSelector from "@/components/ViewSelector";
 import { useAuth } from "@/lib/auth-context";
@@ -16,7 +16,7 @@ import { projects as mockProjects } from "@/data/mockData";
 export default function TasksPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const authenticatedFetch = createAuthenticatedFetch();
 
   const projectId = params.projectId as string;
@@ -183,6 +183,15 @@ export default function TasksPage() {
     }));
   };
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  }, [logout, router]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
@@ -245,6 +254,15 @@ export default function TasksPage() {
               >
                 <LucideSettings size={16} />
               </button>
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="icon-btn text-red-600 hover:text-red-700"
+                  title="Logout"
+                >
+                  <LucideLogOut size={16} />
+                </button>
+              )}
               <ViewSelector currentView={view} onViewChange={setView} />
               <ThemeToggle />
             </div>
