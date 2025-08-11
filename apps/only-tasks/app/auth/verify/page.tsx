@@ -36,8 +36,8 @@ export default function VerifyEmailPage() {
               return;
             }
 
-            // Default success case
-            router.push("/signup?verified=true");
+            // Default success case - redirect to dashboard for magic link verification
+            router.push("/dashboard");
             return;
           } catch (err: unknown) {
             console.error("Error verifying API key:", err);

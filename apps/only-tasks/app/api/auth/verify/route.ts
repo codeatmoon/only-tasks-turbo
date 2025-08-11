@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Verification link is valid",
-      redirect: "/signup?verified=true"
+      redirect: "/dashboard"
     });
 
   } catch (error) {

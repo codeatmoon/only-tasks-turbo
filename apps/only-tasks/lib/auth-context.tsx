@@ -39,12 +39,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Set a timeout to avoid infinite loading if Firebase fails to initialize
+    const timeoutId = setTimeout(() => {
+      console.warn("Firebase authentication initialization timeout - continuing without auth");
+      setLoading(false);
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      clearTimeout(timeoutId);
       setUser(user);
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
